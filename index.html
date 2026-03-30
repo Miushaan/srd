@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRF LOG | MODERN PORTAL</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8fafc; --brand: #2563eb; --navy: #0f172a;
+            --border: #e2e8f0; --glass: rgba(255, 255, 255, 0.8);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
+        
+        body { 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: var(--bg); color: var(--navy); 
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* Modern Glass Header */
+        .glass-header {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            padding: 20px 30px;
+            border-bottom: 1px solid var(--border);
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .logo-area h1 { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; color: var(--navy); }
+        .logo-area span { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; }
+
+        /* Search & Actions */
+        .controls { display: flex; gap: 15px; align-items: center; }
+        .search-container { position: relative; flex-grow: 1; max-width: 600px; }
+        .search-container input { 
+            width: 100%; padding: 12px 15px 12px 45px; 
+            border: 1px solid var(--border); border-radius: 12px; 
+            font-size: 14px; background: white; transition: 0.2s;
+        }
+        .search-container input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .search-container svg { position: absolute; left: 15px; top: 13px; fill: #94a3b8; }
+
+        /* Table Design */
+        .content-area { flex-grow: 1; overflow: auto; padding: 20px 30px; }
+        .table-card { 
+            background: white; border-radius: 16px; border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); overflow: hidden;
+        }
+        table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 1200px; }
+        
+        thead th { 
+            position: sticky; top: 0; background: #f8fafc; z-index: 10;
+            padding: 16px; text-align: left; font-size: 11px; font-weight: 800;
+            color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--border); 
+        }
+
+        tbody td { padding: 15px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: top; }
+
+        /* Modern Status Select */
+        .status-pill { 
+            padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; 
+            width: 100%; border: none; cursor: pointer; appearance: none; text-align: center;
+        }
+        .s-SUBMITTED { background: #eff6ff; color: #1e40af; }
+        .s-RECEIVED { background: #f0fdf4; color: #166534; }
+        .s-HOLD { background: #f8fafc; color: #475569; }
+        .s-CANCELLED { background: #fef2f2; color: #991b1b; }
+        .s-PO { background: #fffbeb; color: #92400e; }
+
+        /* Countdown UI */
+        .eta-tag { display: inline-block; margin-top: 6px; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 800; }
+        .tag-urgent { background: #fee2e2; color: #b91c1c; animation: pulse 2s infinite; }
+        .tag-normal { background: #e0f2fe; color: #0369a1; }
+
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* Auto-Textarea */
+        textarea { 
+            width: 100%; border: 1px solid transparent; border-radius: 8px; 
+            padding: 8px; font-size: 13px; font-family: inherit; resize: none; 
+            background: #f8fafc; transition: 0.2s; color: #334155; line-height: 1.5;
+        }
+        textarea:focus { background: white; border-color: var(--border); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+        /* Buttons */
+        .btn { 
+            padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; 
+            border: none; font-size: 13px; display: flex; align-items: center; gap: 8px;
+            transition: transform 0.1s, background 0.2s;
+        }
+        .btn:active { transform: scale(0.98); }
+        .btn-primary { background: var(--brand); color: white; }
+        .btn-white { background: white; border: 1px solid var(--border); color: var(--navy); }
+
+        /* Modal */
+        .overlay { 
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); 
+            backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; 
+        }
+        .modal { background: white; padding: 32px; border-radius: 20px; width: 420px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); }
+        .modal h2 { font-size: 20px; margin-bottom: 20px; letter-spacing: -0.5px; }
+        .modal input, .modal select { 
+            width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border); 
+            border-radius: 10px; font-family: inherit; font-size: 14px;
+        }
+
+        /* Column Config */
+        .c-date { width: 110px; }
+        .c-prf { width: 150px; }
+        .c-vessel { width: 180px; }
+        .c-ws { width: 140px; }
+        .c-stat { width: 170px; }
+        .c-eta { width: 160px; }
+        .c-rem { width: auto; }
+        .c-del { width: 50px; }
+    </style>
+</head>
+<body>
+
+    <header class="glass-header">
+        <div class="header-main">
+            <div class="logo-area">
+                <span>SRD Steering Committee</span>
+                <h1>PRF TRACKING PORTAL</h1>
+            </div>
+            <div style="display:flex; gap:12px;">
+                <button onclick="exportPDF()" class="btn btn-white">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                    PDF Report
+                </button>
+                <button onclick="openModal()" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    New Entry
+                </button>
+            </div>
+        </div>
+        <div class="controls">
+            <div class="search-container">
+                <svg width="20" height="20" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+                <input type="text" id="main-search" placeholder="Quick search by PRF, Vessel or Workshop..." onkeyup="refreshTable()">
+            </div>
+        </div>
+    </header>
+
+    <main class="content-area">
+        <div class="table-card">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="c-date">Date</th>
+                        <th class="c-prf">PRF Number</th>
+                        <th class="c-vessel">Asset Name</th>
+                        <th class="c-ws">Workshop</th>
+                        <th class="c-stat">Current Status</th>
+                        <th class="c-eta">ETA / Due</th>
+                        <th class="c-rem">Remarks</th>
+                        <th class="c-del"></th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="prf-modal" class="overlay">
+        <div class="modal">
+            <h2>Add New Record</h2>
+            <input type="text" id="m-prf" placeholder="PRF NUMBER">
+            <input type="text" id="m-asset" placeholder="ASSET NAME">
+            <select id="m-workshop">
+                <option value="">SELECT WORKSHOP</option>
+                <option value="DAU/LOS">DAU/LOS</option>
+                <option value="EEW">EEW</option>
+                <option value="MRW">MRW</option>
+                <option value="MSH">MSH</option>
+                <option value="MWU">MWU</option>
+                <option value="NMU">NMU</option>
+                <option value="OSU">OSU</option>
+                <option value="PLU">PLU</option>
+                <option value="SMU">SMU</option>
+                <option value="STU">STU</option>
+            </select>
+            <div style="display:flex; gap:12px; margin-top:10px;">
+                <button onclick="processPRF()" class="btn btn-primary" style="flex:1; justify-content:center;">SAVE</button>
+                <button onclick="closeModal()" class="btn btn-white" style="flex:1; justify-content:center;">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+        import { getDatabase, ref, set, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD612DVL9xvsK1lWVyEB9TehpGJry6Rprw",
+            authDomain: "srd-portal-1234.firebaseapp.com",
+            projectId: "srd-portal-1234",
+            storageBucket: "srd-portal-1234.firebasestorage.app",
+            messagingSenderId: "286585731956",
+            appId: "1:286585731956:web:47641bcf34033b014f4a21"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dbRef = ref(db, 'prf_logs');
+        let logs = [];
+
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            logs = data ? Object.keys(data).map(key => ({ id: key, ...data[key] })) : [];
+            logs.sort((a, b) => new Date(b.rawDate) - new Date(a.rawDate));
+            refreshTable();
+        });
+
+        window.processPRF = () => {
+            const p = document.getElementById('m-prf').value.toUpperCase();
+            const a = document.getElementById('m-asset').value.toUpperCase();
+            const w = document.getElementById('m-workshop').value;
+            if(!p || !a || !w) return alert("All fields are required.");
+            
+            push(dbRef, {
+                date: new Date().toLocaleDateString('en-GB'),
+                rawDate: new Date().toISOString(),
+                prf: p, asset: a, workshop: w, status: 'SUBMITTED', eta: '', remarks: ''
+            });
+            closeModal();
+            document.getElementById('m-prf').value = '';
+            document.getElementById('m-asset').value = '';
+            document.getElementById('m-workshop').value = '';
+        };
+
+        window.autoResize = (el) => {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        };
+
+        window.refreshTable = () => {
+            const query = document.getElementById('main-search').value.toUpperCase();
+            const filtered = logs.filter(l => 
+                l.prf.includes(query) || l.asset.includes(query) || (l.workshop && l.workshop.includes(query))
+            );
+            const body = document.getElementById('table-body');
+            const statuses = ['SUBMITTED', 'PO RAISED', 'DELIVERY PENDING', 'PART RECEIVED', 'ALL RECEIVED', 'ON-HOLD', 'CANCELLED'];
+            
+            body.innerHTML = filtered.map(l => {
+                let etaTag = '';
+                if(l.eta) {
+                    const diff = Math.ceil((new Date(l.eta) - new Date().setHours(0,0,0,0)) / 86400000);
+                    const tagClass = diff <= 2 ? 'tag-urgent' : 'tag-normal';
+                    const text = diff < 0 ? `${Math.abs(diff)}D OVERDUE` : (diff === 0 ? 'DUE TODAY' : `${diff}D LEFT`);
+                    etaTag = `<div class="eta-tag ${tagClass}">${text}</div>`;
+                }
+
+                const sClass = l.status.includes('RECEIVED') ? 's-RECEIVED' : (l.status.includes('PO') ? 's-PO' : `s-${l.status}`);
+
+                return `
+                    <tr>
+                        <td><div style="font-weight:700">${l.date}</div></td>
+                        <td><div style="color:var(--brand); font-weight:800">${l.prf}</div></td>
+                        <td><div style="font-weight:600; color:#334155">${l.asset}</div></td>
+                        <td><div style="font-size:11px; font-weight:800; color:#64748b">${l.workshop || '-'}</div></td>
+                        <td>
+                            <select class="status-pill ${sClass}" onchange="up('${l.id}', 'status', this.value)">
+                                ${statuses.map(st => `<option ${l.status===st?'selected':''}>${st}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td>
+                            <input type="date" style="width:100%; font-size:12px; border:none; background:#f8fafc; padding:4px; border-radius:4px" value="${l.eta}" onchange="up('${l.id}', 'eta', this.value)">
+                            ${etaTag}
+                        </td>
+                        <td>
+                            <textarea oninput="autoResize(this)" onchange="up('${l.id}', 'remarks', this.value.toUpperCase())" placeholder="No remarks...">${l.remarks || ''}</textarea>
+                        </td>
+                        <td><button onclick="del('${l.id}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer; font-size:18px">×</button></td>
+                    </tr>`;
+            }).join('');
+            document.querySelectorAll('textarea').forEach(t => autoResize(t));
+        };
+
+        window.up = (id, f, v) => update(ref(db, `prf_logs/${id}`), { [f]: v });
+        window.del = (id) => confirm("Delete entry?") && remove(ref(db, `prf_logs/${id}`));
+        window.openModal = () => document.getElementById('prf-modal').style.display = 'flex';
+        window.closeModal = () => document.getElementById('prf-modal').style.display = 'none';
+
+        window.exportPDF = () => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4');
+            doc.setFont("helvetica", "bold");
+            doc.text("SRD PRF STATUS REPORT", 14, 15);
+            doc.autoTable({ 
+                startY: 22, 
+                head: [['DATE', 'PRF #', 'ASSET', 'WORKSHOP', 'STATUS', 'ETA', 'REMARKS']], 
+                body: logs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta, l.remarks]),
+                headStyles: { fillColor: [15, 23, 42] },
+                styles: { fontSize: 8, textTransform: 'uppercase' }
+            });
+            doc.save("PRF_Status_Report.pdf");
+        };
+    </script>
+</body>
+</html>
