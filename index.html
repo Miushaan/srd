@@ -29,7 +29,7 @@
         .logo-area h1 { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
         .logo-area span { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; }
 
-        /* Table */
+        /* Table Architecture */
         .content-area { flex-grow: 1; overflow: auto; padding: 20px 30px; }
         .table-card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
         table { width: 100%; border-collapse: collapse; min-width: 1400px; table-layout: fixed; }
@@ -42,12 +42,12 @@
         .w-prf { width: 140px; }
         .w-asset { width: 220px; }
         .w-wk { width: 100px; }
-        .w-status { width: 170px; }
+        .w-status { width: 175px; }
         .w-eta { width: 160px; }
-        .w-remarks { width: auto; } /* Dynamic scaling */
+        .w-remarks { width: auto; } 
         .w-del { width: 50px; }
 
-        /* Status Styling */
+        /* Status Pills */
         .status-pill { padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; appearance: none; text-align: center; }
         .s-PENDING { background: #f1f5f9; color: #475569; }
         .s-ITEM { background: #fef9c3; color: #854d0e; }
@@ -59,16 +59,18 @@
         .s-HOLD { background: #475569; color: white; }
         .s-CANCELLED { background: #fee2e2; color: #991b1b; }
 
+        /* Countdown Labels */
         .cd-text { display: block; font-size: 10px; font-weight: 800; margin-top: 5px; }
         .cd-overdue { color: var(--danger); }
         .cd-today { color: var(--warning); padding: 2px 4px; border: 1px solid var(--warning); border-radius: 4px; display: inline-block; }
         .cd-ok { color: var(--success); }
 
         textarea { width: 100%; border: 1px solid transparent; border-radius: 8px; padding: 8px; font-size: 12px; resize: vertical; min-height: 45px; background: #f8fafc; font-family: inherit; line-height: 1.4; }
-        textarea:focus { background: white; border-color: var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        textarea:focus { background: white; border-color: var(--border); }
 
         .btn { padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 12px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-primary { background: var(--brand); color: white; }
+        .btn-success { background: var(--success); color: white; }
         .btn-white { background: white; border: 1px solid var(--border); color: var(--navy); }
         
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; }
@@ -80,7 +82,7 @@
     <div id="auth-overlay" class="auth-wrapper">
         <div class="auth-card">
             <div style="text-align: center; margin-bottom: 25px;">
-                <span style="font-size:12px; color:#64748b; font-weight:800;">SRD CONTROL</span>
+                <span style="font-size:12px; color:#64748b; font-weight:800;">SRD CONTROL CENTER</span>
                 <h1 style="font-size: 24px; letter-spacing:-1px;">Portal Login</h1>
             </div>
             <input type="email" id="login-email" placeholder="Email Address">
@@ -93,7 +95,7 @@
     <header class="glass-header">
         <div class="header-main">
             <div class="logo-area">
-                <span>SRD PORTAL 2026</span>
+                <span>Operational Control 2026</span>
                 <h1>PRF TRACKING PORTAL</h1>
             </div>
             <div style="display:flex; gap:12px">
@@ -132,7 +134,7 @@
 
     <div id="prf-modal" class="overlay" onclick="if(event.target===this) closeModal()">
         <div class="modal">
-            <h2 style="margin-bottom:20px; letter-spacing:-0.5px">Create New Record</h2>
+            <h2 style="margin-bottom:20px; letter-spacing:-0.5px">Add PRF Record</h2>
             <input type="text" id="m-prf" placeholder="PRF NUMBER" style="width:100%; padding:14px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
             <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:14px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
             <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:25px; border-radius:10px; border:1px solid var(--border); font-family:inherit; font-weight:600">
@@ -150,7 +152,10 @@
                 <option value="ADM">ADM</option>
                 <option value="INV">INV</option>
             </select>
-            <button onclick="savePRF()" class="btn btn-primary" style="width:100%; justify-content:center; padding:15px">INITIALIZE RECORD</button>
+            <div style="display:flex; gap:10px;">
+                <button onclick="savePRF(false)" class="btn btn-primary" style="flex:1; justify-content:center;">SAVE</button>
+                <button onclick="savePRF(true)" class="btn btn-success" style="flex:1.5; justify-content:center;">SAVE & UPLOAD</button>
+            </div>
         </div>
     </div>
 
@@ -158,7 +163,7 @@
         <div class="modal" style="max-width:650px; max-height:80vh; display:flex; flex-direction:column">
             <h3 style="margin-bottom:15px">System Audit Trail</h3>
             <div id="log-content" style="overflow-y:auto; flex-grow:1; border-top:1px solid #eee"></div>
-            <button class="btn btn-white" style="margin-top:15px; width:100%; justify-content:center">Close Logs</button>
+            <button class="btn btn-white" style="margin-top:15px; width:100%; justify-content:center">Close</button>
         </div>
     </div>
 
@@ -190,7 +195,7 @@
         window.handleLogin = () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
-            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "INVALID CREDENTIALS");
+            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "INVALID ACCESS");
         };
         window.handleLogout = () => signOut(auth);
 
@@ -226,8 +231,6 @@
 
         function calculateCountdown(etaStr) {
             if (!etaStr) return '';
-            
-            // Normalize dates to midnight for accurate day comparison
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -242,11 +245,11 @@
             return `<span class="cd-text cd-ok">${diffDays} DAYS REMAINING</span>`;
         }
 
-        window.savePRF = () => {
+        window.savePRF = (redirect) => {
             const p = document.getElementById('m-prf').value.toUpperCase();
             const a = document.getElementById('m-asset').value.toUpperCase();
             const w = document.getElementById('m-workshop').value;
-            if(!p || !a || !w) return alert("All fields required.");
+            if(!p || !a || !w) return alert("Please fill all required fields.");
 
             push(ref(db, 'prf_logs'), {
                 date: new Date().toLocaleDateString('en-GB'),
@@ -258,9 +261,14 @@
             push(ref(db, 'audit_trail'), {
                 time: new Date().toLocaleString(),
                 user: auth.currentUser.email,
-                action: "CREATED", prf: p, details: `Initialized for ${w}`
+                action: "CREATE", prf: p, details: `Added to ${w}`
             });
+
             closeModal();
+
+            if(redirect) {
+                window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u&route=shorturl", "_blank");
+            }
         };
 
         window.refreshTable = () => {
@@ -297,17 +305,17 @@
             push(ref(db, 'audit_trail'), {
                 time: new Date().toLocaleString(),
                 user: auth.currentUser.email,
-                action: "UPDATE", prf: prf, details: `Field [${field}] changed`
+                action: "UPDATE", prf: prf, details: `Updated ${field}`
             });
         };
 
         window.deleteRow = (id, prf) => {
-            if(confirm(`Permanent delete PRF: ${prf}?`)) {
+            if(confirm(`Confirm deletion of PRF ${prf}?`)) {
                 remove(ref(db, `prf_logs/${id}`));
                 push(ref(db, 'audit_trail'), {
                     time: new Date().toLocaleString(),
                     user: auth.currentUser.email,
-                    action: "DELETE", prf: prf, details: "Record removed"
+                    action: "DELETE", prf: prf, details: "Record deleted"
                 });
             }
         };
@@ -316,7 +324,7 @@
             document.getElementById('log-modal').style.display = 'flex';
             document.getElementById('log-content').innerHTML = auditData.map(a => `
                 <div style="padding:12px; border-bottom:1px solid #f1f5f9; font-size:11px">
-                    <b style="color:var(--brand)">${a.time}</b> | <b>${a.user.split('@')[0]}</b><br/>
+                    <b style="color:var(--brand)">${a.time}</b> | <b>${a.user}</b><br/>
                     <span style="color:var(--danger); font-weight:800">${a.action}</span> - PRF: ${a.prf} (${a.details})
                 </div>
             `).join('');
@@ -342,7 +350,7 @@
                 styles: { fontSize: 8, cellPadding: 3 },
                 columnStyles: { 6: { cellWidth: 80 } }
             });
-            doc.save(`PRF_STATUS_REPORT_${new Date().toLocaleDateString()}.pdf`);
+            doc.save(`PRF_REPORT_2026.pdf`);
         };
     </script>
 </body>
