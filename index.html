@@ -12,6 +12,7 @@
         :root {
             --bg: #f8fafc; --brand: #2563eb; --success: #10b981; --navy: #0f172a;
             --border: #e2e8f0; --glass: rgba(255, 255, 255, 0.9);
+            --danger: #ef4444; --warning: #f59e0b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
@@ -22,46 +23,56 @@
         .auth-card { background: white; padding: 40px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); }
         .auth-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 10px; }
 
-        /* Modals */
-        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; }
-        .modal { background: white; padding: 32px; border-radius: 20px; width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); }
-
         /* Header */
         .glass-header { background: var(--glass); backdrop-filter: blur(12px); padding: 20px 30px; border-bottom: 1px solid var(--border); z-index: 100; flex-shrink: 0; }
         .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .logo-area h1 { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
-        .logo-area span { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; }
-
-        /* Search & Controls */
-        .controls { display: flex; gap: 15px; align-items: center; }
-        .search-container { position: relative; flex-grow: 1; max-width: 500px; }
-        .search-container input { width: 100%; padding: 12px 15px; border: 1px solid var(--border); border-radius: 12px; font-size: 14px; background: white; }
+        .logo-area span { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; }
 
         /* Table */
         .content-area { flex-grow: 1; overflow: auto; padding: 20px 30px; }
         .table-card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; }
-        thead th { position: sticky; top: 0; background: #f8fafc; padding: 16px; text-align: left; font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--border); z-index: 10; }
-        tbody td { padding: 15px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
+        table { width: 100%; border-collapse: collapse; min-width: 1400px; table-layout: fixed; }
+        
+        thead th { position: sticky; top: 0; background: #f8fafc; padding: 16px; text-align: left; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--border); z-index: 10; }
+        tbody td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
 
-        /* Status Pills */
-        .status-pill { padding: 6px 12px; border-radius: 8px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; appearance: none; text-align: center; }
-        .s-SUBMITTED { background: #eff6ff; color: #1e40af; }
-        .s-RECEIVED { background: #f0fdf4; color: #166534; }
-        .s-PO { background: #fffbeb; color: #92400e; }
-        .s-CANCELLED { background: #fef2f2; color: #991b1b; }
+        /* Column Widths */
+        .w-date { width: 110px; }
+        .w-prf { width: 140px; }
+        .w-asset { width: 220px; }
+        .w-wk { width: 100px; }
+        .w-status { width: 170px; }
+        .w-eta { width: 160px; }
+        .w-remarks { width: auto; } /* Dynamic scaling */
+        .w-del { width: 50px; }
 
-        textarea { width: 100%; border: 1px solid transparent; border-radius: 8px; padding: 8px; font-size: 13px; resize: none; background: #f8fafc; font-family: inherit; }
-        textarea:focus { background: white; border-color: var(--border); }
+        /* Status Styling */
+        .status-pill { padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; appearance: none; text-align: center; }
+        .s-PENDING { background: #f1f5f9; color: #475569; }
+        .s-ITEM { background: #fef9c3; color: #854d0e; }
+        .s-PR { background: #e0f2fe; color: #075985; }
+        .s-PO { background: #dcfce7; color: #166534; }
+        .s-PAYMENT { background: #fae8ff; color: #86198f; }
+        .s-PART { background: #ffedd5; color: #9a3412; }
+        .s-ALL { background: #10b981; color: white; }
+        .s-HOLD { background: #475569; color: white; }
+        .s-CANCELLED { background: #fee2e2; color: #991b1b; }
 
-        /* Buttons */
+        .cd-text { display: block; font-size: 10px; font-weight: 800; margin-top: 5px; }
+        .cd-overdue { color: var(--danger); }
+        .cd-today { color: var(--warning); padding: 2px 4px; border: 1px solid var(--warning); border-radius: 4px; display: inline-block; }
+        .cd-ok { color: var(--success); }
+
+        textarea { width: 100%; border: 1px solid transparent; border-radius: 8px; padding: 8px; font-size: 12px; resize: vertical; min-height: 45px; background: #f8fafc; font-family: inherit; line-height: 1.4; }
+        textarea:focus { background: white; border-color: var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+
         .btn { padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 12px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
         .btn-primary { background: var(--brand); color: white; }
-        .btn-success { background: var(--success); color: white; }
         .btn-white { background: white; border: 1px solid var(--border); color: var(--navy); }
         
-        .user-tag { font-size: 10px; color: #94a3b8; display: block; margin-top: 2px; font-weight: 700; }
-        .audit-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 11px; line-height: 1.4; }
+        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; }
+        .modal { background: white; padding: 32px; border-radius: 20px; width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
@@ -69,20 +80,20 @@
     <div id="auth-overlay" class="auth-wrapper">
         <div class="auth-card">
             <div style="text-align: center; margin-bottom: 25px;">
-                <span style="font-size:12px; color:#64748b; font-weight:800;">SRD STEERING COMMITTEE</span>
+                <span style="font-size:12px; color:#64748b; font-weight:800;">SRD CONTROL</span>
                 <h1 style="font-size: 24px; letter-spacing:-1px;">Portal Login</h1>
             </div>
             <input type="email" id="login-email" placeholder="Email Address">
             <input type="password" id="login-pass" placeholder="Password">
             <button onclick="handleLogin()" id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">SIGN IN</button>
-            <p id="auth-error" style="color:#ef4444; font-size:12px; margin-top:15px; text-align:center; font-weight:600"></p>
+            <p id="auth-error" style="color:#ef4444; font-size:11px; margin-top:15px; text-align:center; font-weight:700"></p>
         </div>
     </div>
 
     <header class="glass-header">
         <div class="header-main">
             <div class="logo-area">
-                <span>Operational Control</span>
+                <span>SRD PORTAL 2026</span>
                 <h1>PRF TRACKING PORTAL</h1>
             </div>
             <div style="display:flex; gap:12px">
@@ -94,7 +105,7 @@
         </div>
         <div class="controls">
             <div class="search-container">
-                <input type="text" id="main-search" placeholder="Search by PRF, Asset, Workshop or User..." onkeyup="refreshTable()">
+                <input type="text" id="main-search" placeholder="Search PRF, Asset, Workshop..." onkeyup="refreshTable()">
             </div>
         </div>
     </header>
@@ -104,14 +115,14 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:140px">Date & User</th>
-                        <th style="width:140px">PRF Number</th>
-                        <th style="width:180px">Asset Name</th>
-                        <th style="width:120px">Workshop</th>
-                        <th style="width:170px">Status</th>
-                        <th style="width:160px">ETA / Due</th>
-                        <th>Remarks</th>
-                        <th style="width:40px"></th>
+                        <th class="w-date">Date</th>
+                        <th class="w-prf">PRF Number</th>
+                        <th class="w-asset">Asset Name</th>
+                        <th class="w-wk">Workshop</th>
+                        <th class="w-status">Status</th>
+                        <th class="w-eta">Due Date</th>
+                        <th class="w-remarks">Remarks (Detailed)</th>
+                        <th class="w-del"></th>
                     </tr>
                 </thead>
                 <tbody id="table-body"></tbody>
@@ -119,12 +130,12 @@
         </div>
     </main>
 
-    <div id="prf-modal" class="overlay" onclick="closeOnOutside(event)">
-        <div class="modal" onclick="event.stopPropagation()">
-            <h2 style="margin-bottom:20px">Add PRF Record</h2>
-            <input type="text" id="m-prf" placeholder="PRF NUMBER" style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
-            <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:12px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
-            <select id="m-workshop" style="width:100%; padding:12px; margin-bottom:25px; border-radius:10px; border:1px solid var(--border); font-family:inherit;">
+    <div id="prf-modal" class="overlay" onclick="if(event.target===this) closeModal()">
+        <div class="modal">
+            <h2 style="margin-bottom:20px; letter-spacing:-0.5px">Create New Record</h2>
+            <input type="text" id="m-prf" placeholder="PRF NUMBER" style="width:100%; padding:14px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
+            <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:14px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
+            <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:25px; border-radius:10px; border:1px solid var(--border); font-family:inherit; font-weight:600">
                 <option value="">-- SELECT WORKSHOP --</option>
                 <option value="DAU/LOS">DAU/LOS</option>
                 <option value="EEW">EEW</option>
@@ -136,21 +147,18 @@
                 <option value="PLU">PLU</option>
                 <option value="SMU">SMU</option>
                 <option value="STU">STU</option>
-                <option value="WDU">WDU</option>
-                <option value="YDU">YDU</option>
+                <option value="ADM">ADM</option>
+                <option value="INV">INV</option>
             </select>
-            <div style="display:flex; gap:12px;">
-                <button onclick="savePRF(false)" class="btn btn-primary" style="flex:1; justify-content:center;">SAVE</button>
-                <button onclick="savePRF(true)" class="btn btn-success" style="flex:1.5; justify-content:center;">SAVE & UPLOAD</button>
-            </div>
+            <button onclick="savePRF()" class="btn btn-primary" style="width:100%; justify-content:center; padding:15px">INITIALIZE RECORD</button>
         </div>
     </div>
 
     <div id="log-modal" class="overlay" onclick="this.style.display='none'">
-        <div class="modal" style="max-width:600px; max-height:80vh; display:flex; flex-direction:column" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom:15px">Transaction History</h3>
-            <div id="log-content" style="overflow-y:auto; flex-grow:1"></div>
-            <button onclick="document.getElementById('log-modal').style.display='none'" class="btn btn-white" style="margin-top:15px; width:100%; justify-content:center">Close</button>
+        <div class="modal" style="max-width:650px; max-height:80vh; display:flex; flex-direction:column">
+            <h3 style="margin-bottom:15px">System Audit Trail</h3>
+            <div id="log-content" style="overflow-y:auto; flex-grow:1; border-top:1px solid #eee"></div>
+            <button class="btn btn-white" style="margin-top:15px; width:100%; justify-content:center">Close Logs</button>
         </div>
     </div>
 
@@ -173,11 +181,16 @@
         const auth = getAuth(app);
         let logs = [], auditData = [];
 
-        // AUTH
+        const STATUS_OPTIONS = [
+            "PENDING", "ITEM CREATION", "PR/MTR-RAISED", 
+            "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", 
+            "ALL RECEIVED", "OH-HOLD", "CANCELLED"
+        ];
+
         window.handleLogin = () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
-            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "Access Denied.");
+            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "INVALID CREDENTIALS");
         };
         window.handleLogout = () => signOut(auth);
 
@@ -187,110 +200,124 @@
         });
 
         function initData() {
-            // 1. Listen for PRF Data
             onValue(ref(db, 'prf_logs'), snap => {
                 const val = snap.val();
                 logs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
                 logs.sort((a,b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
                 refreshTable();
             });
-
-            // 2. Listen for Audit History (Syncing both folder names)
             onValue(ref(db, 'audit_trail'), snap => {
                 const val = snap.val();
-                if (val) {
-                    auditData = Object.values(val).reverse();
-                } else {
-                    onValue(ref(db, 'activity_logs'), osnap => {
-                        const oval = osnap.val();
-                        auditData = oval ? Object.values(oval).reverse() : [];
-                    });
-                }
+                auditData = val ? Object.values(val).reverse() : [];
             });
         }
 
-        // AUDIT LOGGING
-        function writeAudit(action, prf, details) {
-            push(ref(db, 'audit_trail'), {
-                time: new Date().toLocaleString(),
-                user: auth.currentUser.email,
-                action, prf, details
-            });
+        function getStatusClass(s) {
+            if (s.includes('ITEM')) return 's-ITEM';
+            if (s.includes('PR/')) return 's-PR';
+            if (s.includes('PO-')) return 's-PO';
+            if (s.includes('PAYMENT')) return 's-PAYMENT';
+            if (s.includes('PART')) return 's-PART';
+            if (s.includes('ALL')) return 's-ALL';
+            if (s.includes('HOLD')) return 's-HOLD';
+            if (s.includes('CANCELLED')) return 's-CANCELLED';
+            return 's-PENDING';
         }
 
-        window.savePRF = (redirect) => {
+        function calculateCountdown(etaStr) {
+            if (!etaStr) return '';
+            
+            // Normalize dates to midnight for accurate day comparison
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const due = new Date(etaStr);
+            due.setHours(0, 0, 0, 0);
+            
+            const diffTime = due.getTime() - today.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays === 0) return `<span class="cd-text cd-today">DUE TODAY</span>`;
+            if (diffDays < 0) return `<span class="cd-text cd-overdue">${Math.abs(diffDays)} DAYS OVERDUE</span>`;
+            return `<span class="cd-text cd-ok">${diffDays} DAYS REMAINING</span>`;
+        }
+
+        window.savePRF = () => {
             const p = document.getElementById('m-prf').value.toUpperCase();
             const a = document.getElementById('m-asset').value.toUpperCase();
             const w = document.getElementById('m-workshop').value;
-            if(!p || !a || !w) return alert("Fill all fields.");
+            if(!p || !a || !w) return alert("All fields required.");
 
-            const entry = {
+            push(ref(db, 'prf_logs'), {
                 date: new Date().toLocaleDateString('en-GB'),
                 rawDate: new Date().toISOString(),
-                prf: p, asset: a, workshop: w, status: 'SUBMITTED',
-                eta: '', remarks: '', createdBy: auth.currentUser.email
-            };
-
-            push(ref(db, 'prf_logs'), entry);
-            writeAudit("CREATE", p, redirect ? "Saved & Redirected to MS Form" : "Standard Save");
+                prf: p, asset: a, workshop: w, 
+                status: 'PENDING', eta: '', remarks: ''
+            });
             
+            push(ref(db, 'audit_trail'), {
+                time: new Date().toLocaleString(),
+                user: auth.currentUser.email,
+                action: "CREATED", prf: p, details: `Initialized for ${w}`
+            });
             closeModal();
-            if(redirect) {
-                window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u&route=shorturl", "_blank");
-            }
         };
 
         window.refreshTable = () => {
             const q = document.getElementById('main-search').value.toUpperCase();
             const filtered = logs.filter(l => 
-                (l.prf?.toUpperCase().includes(q)) || 
-                (l.asset?.toUpperCase().includes(q)) || 
-                (l.workshop?.toUpperCase().includes(q)) ||
-                (l.createdBy?.toUpperCase().includes(q))
+                (l.prf?.toUpperCase().includes(q)) || (l.asset?.toUpperCase().includes(q)) || (l.workshop?.toUpperCase().includes(q))
             );
             
             const body = document.getElementById('table-body');
-            const sts = ['SUBMITTED', 'PO RAISED', 'ALL RECEIVED', 'CANCELLED'];
-
-            body.innerHTML = filtered.map(l => {
-                const sCls = l.status?.includes('RECEIVED') ? 's-RECEIVED' : (l.status?.includes('PO') ? 's-PO' : `s-${l.status}`);
-                const userShort = l.createdBy ? l.createdBy.split('@')[0] : 'System';
-                
-                return `<tr>
-                    <td><b>${l.date || '---'}</b><span class="user-tag">@${userShort}</span></td>
-                    <td style="color:var(--brand); font-weight:800">${l.prf || '---'}</td>
-                    <td style="font-weight:600; color:#334155">${l.asset || '---'}</td>
-                    <td style="font-size:11px; font-weight:800; color:#64748b">${l.workshop || '---'}</td>
-                    <td>
-                        <select class="status-pill ${sCls}" onchange="upRow('${l.id}', '${l.prf}', 'status', this.value)">
-                            ${sts.map(s => `<option ${l.status==s?'selected':''}>${s}</option>`).join('')}
+            body.innerHTML = filtered.map(l => `
+                <tr>
+                    <td class="w-date"><b>${l.date}</b></td>
+                    <td class="w-prf" style="color:var(--brand); font-weight:800">${l.prf}</td>
+                    <td class="w-asset" style="font-weight:600; color:#334155">${l.asset}</td>
+                    <td class="w-wk" style="font-weight:800; color:#64748b; font-size:11px">${l.workshop}</td>
+                    <td class="w-status">
+                        <select class="status-pill ${getStatusClass(l.status)}" onchange="updateField('${l.id}', 'status', this.value, '${l.prf}')">
+                            ${STATUS_OPTIONS.map(opt => `<option value="${opt}" ${l.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
                         </select>
                     </td>
-                    <td><input type="date" style="border:none; background:#f8fafc; font-size:12px; padding:4px;" value="${l.eta || ''}" onchange="upRow('${l.id}', '${l.prf}', 'eta', this.value)"></td>
-                    <td><textarea onchange="upRow('${l.id}', '${l.prf}', 'remarks', this.value.toUpperCase())">${l.remarks||''}</textarea></td>
-                    <td><button onclick="delRow('${l.id}', '${l.prf}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer; font-size:18px">×</button></td>
-                </tr>`;
-            }).join('');
+                    <td class="w-eta">
+                        <input type="date" style="border:none; background:#f1f5f9; font-size:12px; padding:5px; border-radius:4px; width:100%" 
+                               value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')">
+                        ${calculateCountdown(l.eta)}
+                    </td>
+                    <td class="w-remarks"><textarea onchange="updateField('${l.id}', 'remarks', this.value.toUpperCase(), '${l.prf}')">${l.remarks||''}</textarea></td>
+                    <td class="w-del"><button onclick="deleteRow('${l.id}', '${l.prf}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer; font-size:18px">×</button></td>
+                </tr>
+            `).join('');
         };
 
-        window.upRow = (id, prf, f, v) => {
-            update(ref(db, `prf_logs/${id}`), { [f]: v });
-            writeAudit("UPDATE", prf, `Field [${f}] changed to "${v}"`);
+        window.updateField = (id, field, val, prf) => {
+            update(ref(db, `prf_logs/${id}`), { [field]: val });
+            push(ref(db, 'audit_trail'), {
+                time: new Date().toLocaleString(),
+                user: auth.currentUser.email,
+                action: "UPDATE", prf: prf, details: `Field [${field}] changed`
+            });
         };
 
-        window.delRow = (id, prf) => {
-            if(confirm(`Delete PRF ${prf} permanently?`)) {
+        window.deleteRow = (id, prf) => {
+            if(confirm(`Permanent delete PRF: ${prf}?`)) {
                 remove(ref(db, `prf_logs/${id}`));
-                writeAudit("DELETE", prf, "Record removed from database");
+                push(ref(db, 'audit_trail'), {
+                    time: new Date().toLocaleString(),
+                    user: auth.currentUser.email,
+                    action: "DELETE", prf: prf, details: "Record removed"
+                });
             }
         };
 
         window.showAudit = () => {
             document.getElementById('log-modal').style.display = 'flex';
             document.getElementById('log-content').innerHTML = auditData.map(a => `
-                <div class="audit-item">
-                    <b style="color:var(--brand)">[${a.time}]</b> User: <b>${a.user}</b><br/>
-                    <span style="font-weight:800; color:#ef4444">${a.action}</span> | PRF: <b>${a.prf}</b> - ${a.details}
+                <div style="padding:12px; border-bottom:1px solid #f1f5f9; font-size:11px">
+                    <b style="color:var(--brand)">${a.time}</b> | <b>${a.user.split('@')[0]}</b><br/>
+                    <span style="color:var(--danger); font-weight:800">${a.action}</span> - PRF: ${a.prf} (${a.details})
                 </div>
             `).join('');
         };
@@ -301,20 +328,21 @@
             document.getElementById('m-prf').value = '';
             document.getElementById('m-asset').value = '';
         };
-        window.closeOnOutside = (e) => { if(e.target.id === 'prf-modal') closeModal(); };
 
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
+            doc.setFontSize(18);
             doc.text("PRF STATUS SUMMARY - 2026", 14, 15);
             doc.autoTable({ 
                 startY: 22,
-                head: [['DATE', 'PRF #', 'ASSET', 'WORKSHOP', 'STATUS', 'ETA', 'USER']],
-                body: logs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta, l.createdBy]),
-                headStyles: { fillColor: [15, 23, 42] },
-                styles: { fontSize: 8 }
+                head: [['DATE', 'PRF #', 'ASSET', 'WORKSHOP', 'STATUS', 'DUE DATE', 'REMARKS']],
+                body: logs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta, l.remarks]),
+                headStyles: { fillColor: [15, 23, 42], fontSize: 8 },
+                styles: { fontSize: 8, cellPadding: 3 },
+                columnStyles: { 6: { cellWidth: 80 } }
             });
-            doc.save("PRF_Report_2026.pdf");
+            doc.save(`PRF_STATUS_REPORT_${new Date().toLocaleDateString()}.pdf`);
         };
     </script>
 </body>
