@@ -3,141 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRF LOG | SECURE PORTAL 2026</title>
+    <title>SRD PRF TRACKING | 2026</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg: #f8fafc; --brand: #2563eb; --success: #10b981; --navy: #0f172a;
-            --border: #e2e8f0; --glass: rgba(255, 255, 255, 0.9);
-            --danger: #ef4444; --warning: #f59e0b;
+            --bg: #fdfdfd; --side: #0f172a; --brand: #6366f1; --brand-light: #e0e7ff;
+            --success: #10b981; --border: #f1f5f9; --text-main: #1e293b;
+            --text-muted: #64748b; --danger: #f43f5e; --warning: #f59e0b;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--navy); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Authentication Overlay */
-        .auth-wrapper { position: fixed; inset: 0; z-index: 1000; display: flex; align-items: center; justify-content: center; background: #f1f5f9; }
-        .auth-card { background: white; padding: 40px; border-radius: 24px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); border: 1px solid var(--border); }
-        .auth-card input { width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid var(--border); border-radius: 10px; }
+        /* Sidebar */
+        .sidebar { width: 280px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 40px 20px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 100; }
+        .logo-box { margin-bottom: 50px; padding: 0 10px; border-left: 3px solid var(--brand); padding-left: 15px; }
+        .logo-box h1 { font-size: 18px; font-weight: 800; line-height: 1.2; color: #fff; text-transform: uppercase; }
 
-        /* Header */
-        .glass-header { background: var(--glass); backdrop-filter: blur(12px); padding: 20px 30px; border-bottom: 1px solid var(--border); z-index: 100; flex-shrink: 0; }
-        .header-main { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo-area h1 { font-weight: 800; font-size: 20px; letter-spacing: -0.5px; }
-        .logo-area span { font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; }
+        .nav-btn { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
 
-        /* Table Architecture */
-        .content-area { flex-grow: 1; overflow: auto; padding: 20px 30px; }
-        .table-card { background: white; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; min-width: 1400px; table-layout: fixed; }
-        
-        thead th { position: sticky; top: 0; background: #f8fafc; padding: 16px; text-align: left; font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; border-bottom: 1px solid var(--border); z-index: 10; }
-        tbody td { padding: 12px 16px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
+        /* Main Layout */
+        .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #f8fafc; }
+        .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+        .search-wrap { position: relative; width: 450px; }
+        .search-wrap input { width: 100%; padding: 12px 20px; border-radius: 14px; border: 1px solid var(--border); background: #f8fafc; font-size: 14px; }
 
-        /* Column Widths */
-        .w-date { width: 110px; }
-        .w-prf { width: 140px; }
-        .w-asset { width: 220px; }
-        .w-wk { width: 100px; }
-        .w-status { width: 175px; }
-        .w-eta { width: 160px; }
-        .w-remarks { width: auto; } 
-        .w-del { width: 50px; }
+        /* Table Area */
+        .main-content { flex: 1; padding: 30px 40px; overflow: auto; }
+        .table-container { background: white; border-radius: 24px; box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        table { width: 100%; border-collapse: collapse; min-width: 1200px; table-layout: fixed; }
+        thead th { position: sticky; top: 0; z-index: 10; background: #fbfcfd; padding: 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        tbody td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
 
-        /* Status Pills */
-        .status-pill { padding: 8px; border-radius: 8px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; appearance: none; text-align: center; }
+        /* Remarks - Auto Expanding */
+        .remarks-editor { width: 100%; min-height: 40px; padding: 10px; background: #f8fafc; border-radius: 10px; border: 1px solid transparent; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; transition: 0.2s; }
+        .remarks-editor:focus { background: white; border-color: var(--brand-light); outline: none; }
+
+        /* Status Colors */
+        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; appearance: none; text-align: center; }
         .s-PENDING { background: #f1f5f9; color: #475569; }
-        .s-ITEM { background: #fef9c3; color: #854d0e; }
-        .s-PR { background: #e0f2fe; color: #075985; }
-        .s-PO { background: #dcfce7; color: #166534; }
-        .s-PAYMENT { background: #fae8ff; color: #86198f; }
-        .s-PART { background: #ffedd5; color: #9a3412; }
-        .s-ALL { background: #10b981; color: white; }
-        .s-HOLD { background: #475569; color: white; }
-        .s-CANCELLED { background: #fee2e2; color: #991b1b; }
+        .s-PO-RAISED { background: #dcfce7; color: #166534; }
+        .s-ALL-RECEIVED { background: var(--success); color: white; }
 
-        /* Countdown Labels */
-        .cd-text { display: block; font-size: 10px; font-weight: 800; margin-top: 5px; }
-        .cd-overdue { color: var(--danger); }
-        .cd-today { color: var(--warning); padding: 2px 4px; border: 1px solid var(--warning); border-radius: 4px; display: inline-block; }
-        .cd-ok { color: var(--success); }
-
-        textarea { width: 100%; border: 1px solid transparent; border-radius: 8px; padding: 8px; font-size: 12px; resize: vertical; min-height: 45px; background: #f8fafc; font-family: inherit; line-height: 1.4; }
-        textarea:focus { background: white; border-color: var(--border); }
-
-        .btn { padding: 12px 20px; border-radius: 10px; font-weight: 700; cursor: pointer; border: none; font-size: 12px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        /* Overlays */
+        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal { background: white; padding: 45px; border-radius: 28px; width: 550px; max-height: 85vh; display: flex; flex-direction: column; }
+        .btn-main { padding: 16px 28px; border-radius: 14px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; }
         .btn-primary { background: var(--brand); color: white; }
-        .btn-success { background: var(--success); color: white; }
-        .btn-white { background: white; border: 1px solid var(--border); color: var(--navy); }
-        
-        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 200; }
-        .modal { background: white; padding: 32px; border-radius: 20px; width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); }
     </style>
 </head>
 <body>
 
-    <div id="auth-overlay" class="auth-wrapper">
-        <div class="auth-card">
-            <div style="text-align: center; margin-bottom: 25px;">
-                <span style="font-size:12px; color:#64748b; font-weight:800;">SRD CONTROL CENTER</span>
-                <h1 style="font-size: 24px; letter-spacing:-1px;">Portal Login</h1>
-            </div>
-            <input type="email" id="login-email" placeholder="Email Address">
-            <input type="password" id="login-pass" placeholder="Password">
-            <button onclick="handleLogin()" id="login-btn" class="btn btn-primary" style="width: 100%; justify-content: center;">SIGN IN</button>
-            <p id="auth-error" style="color:#ef4444; font-size:11px; margin-top:15px; text-align:center; font-weight:700"></p>
+    <div id="auth-overlay" style="position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 5000;">
+        <div style="background: white; padding: 60px; border-radius: 35px; width: 450px; text-align: center;">
+            <h2 style="font-weight: 800; margin-bottom: 30px;">SYSTEM ACCESS</h2>
+            <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:16px; margin-bottom:15px; border-radius:14px; border:1px solid var(--border);">
+            <input type="password" id="login-pass" placeholder="Password" style="width:100%; padding:16px; margin-bottom:25px; border-radius:14px; border:1px solid var(--border);">
+            <button onclick="handleLogin()" class="btn-main btn-primary" style="width:100%">Authenticate</button>
+            <p id="auth-error" style="color:var(--danger); font-size:12px; margin-top:20px; font-weight:800;"></p>
         </div>
     </div>
 
-    <header class="glass-header">
-        <div class="header-main">
-            <div class="logo-area">
-                <span>Operational Control 2026</span>
-                <h1>PRF TRACKING PORTAL</h1>
-            </div>
-            <div style="display:flex; gap:12px">
-                <button onclick="showAudit()" class="btn btn-white">Audit Logs</button>
-                <button onclick="exportPDF()" class="btn btn-white">Export PDF</button>
-                <button onclick="openModal()" class="btn btn-primary">+ New Entry</button>
-                <button onclick="handleLogout()" class="btn btn-white" style="color:#ef4444; border-color:#fee2e2">Logout</button>
-            </div>
-        </div>
-        <div class="controls">
-            <div class="search-container">
-                <input type="text" id="main-search" placeholder="Search PRF, Asset, Workshop..." onkeyup="refreshTable()">
-            </div>
-        </div>
-    </header>
+    <nav class="sidebar">
+        <div class="logo-box"><h1>SRD PRF<br>TRACKING PORTAL</h1></div>
+        <button class="nav-btn active">Dashboard</button>
+        <button onclick="showAudit()" class="nav-btn">Audit Trail</button>
+        <button onclick="exportPDF()" class="nav-btn">Export PDF</button>
+        <button onclick="handleLogout()" class="nav-btn" style="margin-top:20px; color: #f43f5e;">Sign Out</button>
+        <div id="online-list" style="margin-top:auto; font-size: 11px; color:#cbd5e1;"></div>
+    </nav>
 
-    <main class="content-area">
-        <div class="table-card">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="w-date">Date</th>
-                        <th class="w-prf">PRF Number</th>
-                        <th class="w-asset">Asset Name</th>
-                        <th class="w-wk">Workshop</th>
-                        <th class="w-status">Status</th>
-                        <th class="w-eta">Due Date</th>
-                        <th class="w-remarks">Remarks (Detailed)</th>
-                        <th class="w-del"></th>
-                    </tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
+    <div class="wrapper">
+        <header class="top-bar">
+            <div class="search-wrap"><input type="text" id="main-search" placeholder="Search entries..." onkeyup="refreshTable()"></div>
+            <button onclick="openModal()" class="btn-main btn-primary">+ New Entry</button>
+        </header>
+
+        <main class="main-content">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 110px;">Date</th>
+                            <th style="width: 130px;">PRF #</th>
+                            <th style="width: 180px;">Asset Name</th>
+                            <th style="width: 100px;">Workshop</th>
+                            <th style="width: 180px;">Status</th>
+                            <th style="width: 150px;">Due Date</th>
+                            <th style="width: auto;">Detailed Remarks</th>
+                            <th style="width: 50px;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="audit-modal" class="overlay" onclick="if(event.target===this) this.style.display='none'">
+        <div class="modal">
+            <h2 style="margin-bottom:20px; font-weight:800;">AUDIT TRAIL</h2>
+            <div id="audit-content" style="overflow-y:auto; flex:1; border-top:1px solid #eee; padding-top:10px;"></div>
+            <button onclick="document.getElementById('audit-modal').style.display='none'" class="btn-main" style="margin-top:20px; background:#eee;">Close</button>
         </div>
-    </main>
+    </div>
 
     <div id="prf-modal" class="overlay" onclick="if(event.target===this) closeModal()">
         <div class="modal">
-            <h2 style="margin-bottom:20px; letter-spacing:-0.5px">Add PRF Record</h2>
-            <input type="text" id="m-prf" placeholder="PRF NUMBER" style="width:100%; padding:14px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
-            <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:14px; margin-bottom:15px; border-radius:10px; border:1px solid var(--border);">
-            <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:25px; border-radius:10px; border:1px solid var(--border); font-family:inherit; font-weight:600">
+            <h2 style="margin-bottom:30px; font-weight: 800;">NEW PRF RECORD</h2>
+            <input type="text" id="m-prf" placeholder="PRF NUMBER" style="width:100%; padding:16px; margin-bottom:15px; border-radius:14px; border:1px solid var(--border);">
+            <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:16px; margin-bottom:15px; border-radius:14px; border:1px solid var(--border);">
+            <select id="m-workshop" style="width:100%; padding:16px; margin-bottom:25px; border-radius:14px; border:1px solid var(--border);">
                 <option value="">-- SELECT WORKSHOP --</option>
                 <option value="DAU/LOS">DAU/LOS</option>
                 <option value="EEW">EEW</option>
@@ -152,24 +133,13 @@
                 <option value="ADM">ADM</option>
                 <option value="INV">INV</option>
             </select>
-            <div style="display:flex; gap:10px;">
-                <button onclick="savePRF(false)" class="btn btn-primary" style="flex:1; justify-content:center;">SAVE</button>
-                <button onclick="savePRF(true)" class="btn btn-success" style="flex:1.5; justify-content:center;">SAVE & UPLOAD</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="log-modal" class="overlay" onclick="this.style.display='none'">
-        <div class="modal" style="max-width:650px; max-height:80vh; display:flex; flex-direction:column">
-            <h3 style="margin-bottom:15px">System Audit Trail</h3>
-            <div id="log-content" style="overflow-y:auto; flex-grow:1; border-top:1px solid #eee"></div>
-            <button class="btn btn-white" style="margin-top:15px; width:100%; justify-content:center">Close</button>
+            <button onclick="savePRF()" class="btn-main btn-primary" style="width:100%">Save Entry</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getDatabase, ref, push, onValue, remove, update } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
+        import { getDatabase, ref, push, onValue, remove, update, onDisconnect, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
         const firebaseConfig = {
@@ -184,24 +154,18 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
-        let logs = [], auditData = [];
+        let logs = [], auditLogs = [];
 
-        const STATUS_OPTIONS = [
-            "PENDING", "ITEM CREATION", "PR/MTR-RAISED", 
-            "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", 
-            "ALL RECEIVED", "OH-HOLD", "CANCELLED"
-        ];
+        const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
 
         window.handleLogin = () => {
-            const e = document.getElementById('login-email').value;
-            const p = document.getElementById('login-pass').value;
-            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "INVALID ACCESS");
+            signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value).catch(() => alert("Denied"));
         };
         window.handleLogout = () => signOut(auth);
 
         onAuthStateChanged(auth, user => {
             document.getElementById('auth-overlay').style.display = user ? 'none' : 'flex';
-            if(user) initData();
+            if(user) { initData(); }
         });
 
         function initData() {
@@ -213,89 +177,27 @@
             });
             onValue(ref(db, 'audit_trail'), snap => {
                 const val = snap.val();
-                auditData = val ? Object.values(val).reverse() : [];
+                auditLogs = val ? Object.values(val).reverse() : [];
             });
         }
-
-        function getStatusClass(s) {
-            if (s.includes('ITEM')) return 's-ITEM';
-            if (s.includes('PR/')) return 's-PR';
-            if (s.includes('PO-')) return 's-PO';
-            if (s.includes('PAYMENT')) return 's-PAYMENT';
-            if (s.includes('PART')) return 's-PART';
-            if (s.includes('ALL')) return 's-ALL';
-            if (s.includes('HOLD')) return 's-HOLD';
-            if (s.includes('CANCELLED')) return 's-CANCELLED';
-            return 's-PENDING';
-        }
-
-        function calculateCountdown(etaStr) {
-            if (!etaStr) return '';
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const due = new Date(etaStr);
-            due.setHours(0, 0, 0, 0);
-            
-            const diffTime = due.getTime() - today.getTime();
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays === 0) return `<span class="cd-text cd-today">DUE TODAY</span>`;
-            if (diffDays < 0) return `<span class="cd-text cd-overdue">${Math.abs(diffDays)} DAYS OVERDUE</span>`;
-            return `<span class="cd-text cd-ok">${diffDays} DAYS REMAINING</span>`;
-        }
-
-        window.savePRF = (redirect) => {
-            const p = document.getElementById('m-prf').value.toUpperCase();
-            const a = document.getElementById('m-asset').value.toUpperCase();
-            const w = document.getElementById('m-workshop').value;
-            if(!p || !a || !w) return alert("Please fill all required fields.");
-
-            push(ref(db, 'prf_logs'), {
-                date: new Date().toLocaleDateString('en-GB'),
-                rawDate: new Date().toISOString(),
-                prf: p, asset: a, workshop: w, 
-                status: 'PENDING', eta: '', remarks: ''
-            });
-            
-            push(ref(db, 'audit_trail'), {
-                time: new Date().toLocaleString(),
-                user: auth.currentUser.email,
-                action: "CREATE", prf: p, details: `Added to ${w}`
-            });
-
-            closeModal();
-
-            if(redirect) {
-                window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u&route=shorturl", "_blank");
-            }
-        };
 
         window.refreshTable = () => {
             const q = document.getElementById('main-search').value.toUpperCase();
-            const filtered = logs.filter(l => 
-                (l.prf?.toUpperCase().includes(q)) || (l.asset?.toUpperCase().includes(q)) || (l.workshop?.toUpperCase().includes(q))
-            );
-            
-            const body = document.getElementById('table-body');
-            body.innerHTML = filtered.map(l => `
+            const filtered = logs.filter(l => (l.prf?.includes(q) || l.asset?.includes(q)));
+            document.getElementById('table-body').innerHTML = filtered.map(l => `
                 <tr>
-                    <td class="w-date"><b>${l.date}</b></td>
-                    <td class="w-prf" style="color:var(--brand); font-weight:800">${l.prf}</td>
-                    <td class="w-asset" style="font-weight:600; color:#334155">${l.asset}</td>
-                    <td class="w-wk" style="font-weight:800; color:#64748b; font-size:11px">${l.workshop}</td>
-                    <td class="w-status">
-                        <select class="status-pill ${getStatusClass(l.status)}" onchange="updateField('${l.id}', 'status', this.value, '${l.prf}')">
-                            ${STATUS_OPTIONS.map(opt => `<option value="${opt}" ${l.status === opt ? 'selected' : ''}>${opt}</option>`).join('')}
+                    <td>${l.date}</td>
+                    <td style="font-weight:800; color:var(--brand);">${l.prf}</td>
+                    <td style="font-weight:700;">${l.asset}</td>
+                    <td>${l.workshop}</td>
+                    <td>
+                        <select class="status-select s-${l.status.replace(/[/ ]/g, '-')}" onchange="updateField('${l.id}', 'status', this.value, '${l.prf}')">
+                            ${STATUS_OPTIONS.map(o => `<option ${l.status==o?'selected':''}>${o}</option>`).join('')}
                         </select>
                     </td>
-                    <td class="w-eta">
-                        <input type="date" style="border:none; background:#f1f5f9; font-size:12px; padding:5px; border-radius:4px; width:100%" 
-                               value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')">
-                        ${calculateCountdown(l.eta)}
-                    </td>
-                    <td class="w-remarks"><textarea onchange="updateField('${l.id}', 'remarks', this.value.toUpperCase(), '${l.prf}')">${l.remarks||''}</textarea></td>
-                    <td class="w-del"><button onclick="deleteRow('${l.id}', '${l.prf}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer; font-size:18px">×</button></td>
+                    <td><input type="date" value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')"></td>
+                    <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
+                    <td><button onclick="deleteRow('${l.id}')">×</button></td>
                 </tr>
             `).join('');
         };
@@ -304,53 +206,40 @@
             update(ref(db, `prf_logs/${id}`), { [field]: val });
             push(ref(db, 'audit_trail'), {
                 time: new Date().toLocaleString(),
-                user: auth.currentUser.email,
-                action: "UPDATE", prf: prf, details: `Updated ${field}`
+                user: auth.currentUser.email.split('@')[0].toUpperCase(),
+                action: `Updated ${field}`,
+                prf: prf,
+                details: val
             });
         };
 
-        window.deleteRow = (id, prf) => {
-            if(confirm(`Confirm deletion of PRF ${prf}?`)) {
-                remove(ref(db, `prf_logs/${id}`));
-                push(ref(db, 'audit_trail'), {
-                    time: new Date().toLocaleString(),
-                    user: auth.currentUser.email,
-                    action: "DELETE", prf: prf, details: "Record deleted"
-                });
-            }
-        };
-
         window.showAudit = () => {
-            document.getElementById('log-modal').style.display = 'flex';
-            document.getElementById('log-content').innerHTML = auditData.map(a => `
-                <div style="padding:12px; border-bottom:1px solid #f1f5f9; font-size:11px">
-                    <b style="color:var(--brand)">${a.time}</b> | <b>${a.user}</b><br/>
-                    <span style="color:var(--danger); font-weight:800">${a.action}</span> - PRF: ${a.prf} (${a.details})
+            document.getElementById('audit-modal').style.display = 'flex';
+            document.getElementById('audit-content').innerHTML = auditLogs.slice(0, 50).map(a => `
+                <div style="padding:10px; border-bottom:1px solid #f9f9f9; font-size:11px;">
+                    <b style="color:var(--brand)">${a.time}</b> | <b>${a.user}</b><br>
+                    PRF: ${a.prf} -> <span style="color:var(--danger)">${a.action}</span> (${a.details})
                 </div>
             `).join('');
         };
 
-        window.openModal = () => document.getElementById('prf-modal').style.display = 'flex';
-        window.closeModal = () => {
-            document.getElementById('prf-modal').style.display = 'none';
-            document.getElementById('m-prf').value = '';
-            document.getElementById('m-asset').value = '';
+        window.savePRF = () => {
+            const p = document.getElementById('m-prf').value.toUpperCase();
+            const a = document.getElementById('m-asset').value.toUpperCase();
+            const w = document.getElementById('m-workshop').value;
+            if(!p || !a || !w) return;
+            push(ref(db, 'prf_logs'), { date: new Date().toLocaleDateString('en-GB'), rawDate: new Date().toISOString(), prf: p, asset: a, workshop: w, status: 'PENDING', eta: '', remarks: '' });
+            closeModal();
         };
 
+        window.deleteRow = (id) => { if(confirm('Delete?')) remove(ref(db, `prf_logs/${id}`)); };
+        window.openModal = () => document.getElementById('prf-modal').style.display = 'flex';
+        window.closeModal = () => document.getElementById('prf-modal').style.display = 'none';
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4');
-            doc.setFontSize(18);
-            doc.text("PRF STATUS SUMMARY - 2026", 14, 15);
-            doc.autoTable({ 
-                startY: 22,
-                head: [['DATE', 'PRF #', 'ASSET', 'WORKSHOP', 'STATUS', 'DUE DATE', 'REMARKS']],
-                body: logs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta, l.remarks]),
-                headStyles: { fillColor: [15, 23, 42], fontSize: 8 },
-                styles: { fontSize: 8, cellPadding: 3 },
-                columnStyles: { 6: { cellWidth: 80 } }
-            });
-            doc.save(`PRF_REPORT_2026.pdf`);
+            const doc = new jsPDF('l');
+            doc.autoTable({ head: [['DATE', 'PRF', 'ASSET', 'STATUS', 'REMARKS']], body: logs.map(l => [l.date, l.prf, l.asset, l.status, l.remarks]) });
+            doc.save('SRD_REPORT.pdf');
         };
     </script>
 </body>
