@@ -61,7 +61,7 @@
         .btn-white { background: white; border: 1px solid var(--border); color: var(--navy); }
         
         .user-tag { font-size: 10px; color: #94a3b8; display: block; margin-top: 2px; font-weight: 700; }
-        .audit-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 11px; }
+        .audit-item { padding: 10px; border-bottom: 1px solid #f1f5f9; font-size: 11px; line-height: 1.4; }
     </style>
 </head>
 <body>
@@ -104,7 +104,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:120px">Date & User</th>
+                        <th style="width:140px">Date & User</th>
                         <th style="width:140px">PRF Number</th>
                         <th style="width:180px">Asset Name</th>
                         <th style="width:120px">Workshop</th>
@@ -148,8 +148,9 @@
 
     <div id="log-modal" class="overlay" onclick="this.style.display='none'">
         <div class="modal" style="max-width:600px; max-height:80vh; display:flex; flex-direction:column" onclick="event.stopPropagation()">
-            <h3 style="margin-bottom:15px">Transaction History (Audit Trail)</h3>
+            <h3 style="margin-bottom:15px">Transaction History</h3>
             <div id="log-content" style="overflow-y:auto; flex-grow:1"></div>
+            <button onclick="document.getElementById('log-modal').style.display='none'" class="btn btn-white" style="margin-top:15px; width:100%; justify-content:center">Close</button>
         </div>
     </div>
 
@@ -176,30 +177,40 @@
         window.handleLogin = () => {
             const e = document.getElementById('login-email').value;
             const p = document.getElementById('login-pass').value;
-            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "Unauthorized Access.");
+            signInWithEmailAndPassword(auth, e, p).catch(() => document.getElementById('auth-error').textContent = "Access Denied.");
         };
         window.handleLogout = () => signOut(auth);
 
         onAuthStateChanged(auth, user => {
             document.getElementById('auth-overlay').style.display = user ? 'none' : 'flex';
-            if(user) initApp();
+            if(user) initData();
         });
 
-        function initApp() {
+        function initData() {
+            // 1. Listen for PRF Data
             onValue(ref(db, 'prf_logs'), snap => {
                 const val = snap.val();
                 logs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
-                logs.sort((a,b) => new Date(b.rawDate) - new Date(a.rawDate));
+                logs.sort((a,b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
                 refreshTable();
             });
+
+            // 2. Listen for Audit History (Syncing both folder names)
             onValue(ref(db, 'audit_trail'), snap => {
                 const val = snap.val();
-                auditData = val ? Object.values(val).reverse() : [];
+                if (val) {
+                    auditData = Object.values(val).reverse();
+                } else {
+                    onValue(ref(db, 'activity_logs'), osnap => {
+                        const oval = osnap.val();
+                        auditData = oval ? Object.values(oval).reverse() : [];
+                    });
+                }
             });
         }
 
-        // AUDIT LOG
-        function writeLog(action, prf, details) {
+        // AUDIT LOGGING
+        function writeAudit(action, prf, details) {
             push(ref(db, 'audit_trail'), {
                 time: new Date().toLocaleString(),
                 user: auth.currentUser.email,
@@ -211,7 +222,7 @@
             const p = document.getElementById('m-prf').value.toUpperCase();
             const a = document.getElementById('m-asset').value.toUpperCase();
             const w = document.getElementById('m-workshop').value;
-            if(!p || !a || !w) return alert("Please fill all fields.");
+            if(!p || !a || !w) return alert("Fill all fields.");
 
             const entry = {
                 date: new Date().toLocaleDateString('en-GB'),
@@ -221,35 +232,41 @@
             };
 
             push(ref(db, 'prf_logs'), entry);
-            writeLog("CREATE", p, redirect ? "Saved & Redirected to MS Form" : "Standard Save");
+            writeAudit("CREATE", p, redirect ? "Saved & Redirected to MS Form" : "Standard Save");
             
             closeModal();
-
             if(redirect) {
-                // REDIRECT TO THE PROVIDED MS FORM LINK
                 window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u&route=shorturl", "_blank");
             }
         };
 
         window.refreshTable = () => {
             const q = document.getElementById('main-search').value.toUpperCase();
-            const filtered = logs.filter(l => l.prf.includes(q) || l.asset.includes(q) || l.workshop.includes(q) || l.createdBy.toUpperCase().includes(q));
+            const filtered = logs.filter(l => 
+                (l.prf?.toUpperCase().includes(q)) || 
+                (l.asset?.toUpperCase().includes(q)) || 
+                (l.workshop?.toUpperCase().includes(q)) ||
+                (l.createdBy?.toUpperCase().includes(q))
+            );
+            
             const body = document.getElementById('table-body');
             const sts = ['SUBMITTED', 'PO RAISED', 'ALL RECEIVED', 'CANCELLED'];
 
             body.innerHTML = filtered.map(l => {
-                const sCls = l.status.includes('RECEIVED') ? 's-RECEIVED' : (l.status.includes('PO') ? 's-PO' : `s-${l.status}`);
+                const sCls = l.status?.includes('RECEIVED') ? 's-RECEIVED' : (l.status?.includes('PO') ? 's-PO' : `s-${l.status}`);
+                const userShort = l.createdBy ? l.createdBy.split('@')[0] : 'System';
+                
                 return `<tr>
-                    <td><b>${l.date}</b><span class="user-tag">@${l.createdBy.split('@')[0]}</span></td>
-                    <td style="color:var(--brand); font-weight:800">${l.prf}</td>
-                    <td style="font-weight:600; color:#334155">${l.asset}</td>
-                    <td style="font-size:11px; font-weight:800; color:#64748b">${l.workshop}</td>
+                    <td><b>${l.date || '---'}</b><span class="user-tag">@${userShort}</span></td>
+                    <td style="color:var(--brand); font-weight:800">${l.prf || '---'}</td>
+                    <td style="font-weight:600; color:#334155">${l.asset || '---'}</td>
+                    <td style="font-size:11px; font-weight:800; color:#64748b">${l.workshop || '---'}</td>
                     <td>
                         <select class="status-pill ${sCls}" onchange="upRow('${l.id}', '${l.prf}', 'status', this.value)">
                             ${sts.map(s => `<option ${l.status==s?'selected':''}>${s}</option>`).join('')}
                         </select>
                     </td>
-                    <td><input type="date" style="border:none; background:#f8fafc; font-size:12px; padding:4px;" value="${l.eta}" onchange="upRow('${l.id}', '${l.prf}', 'eta', this.value)"></td>
+                    <td><input type="date" style="border:none; background:#f8fafc; font-size:12px; padding:4px;" value="${l.eta || ''}" onchange="upRow('${l.id}', '${l.prf}', 'eta', this.value)"></td>
                     <td><textarea onchange="upRow('${l.id}', '${l.prf}', 'remarks', this.value.toUpperCase())">${l.remarks||''}</textarea></td>
                     <td><button onclick="delRow('${l.id}', '${l.prf}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer; font-size:18px">×</button></td>
                 </tr>`;
@@ -258,13 +275,13 @@
 
         window.upRow = (id, prf, f, v) => {
             update(ref(db, `prf_logs/${id}`), { [f]: v });
-            writeLog("UPDATE", prf, `Changed ${f} to "${v}"`);
+            writeAudit("UPDATE", prf, `Field [${f}] changed to "${v}"`);
         };
 
         window.delRow = (id, prf) => {
-            if(confirm(`Permanent deletion of PRF ${prf}?`)) {
+            if(confirm(`Delete PRF ${prf} permanently?`)) {
                 remove(ref(db, `prf_logs/${id}`));
-                writeLog("DELETE", prf, "Record removed from portal");
+                writeAudit("DELETE", prf, "Record removed from database");
             }
         };
 
@@ -283,14 +300,13 @@
             document.getElementById('prf-modal').style.display = 'none';
             document.getElementById('m-prf').value = '';
             document.getElementById('m-asset').value = '';
-            document.getElementById('m-workshop').value = '';
         };
         window.closeOnOutside = (e) => { if(e.target.id === 'prf-modal') closeModal(); };
 
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
-            doc.text("PRF PORTAL STATUS SUMMARY - 2026", 14, 15);
+            doc.text("PRF STATUS SUMMARY - 2026", 14, 15);
             doc.autoTable({ 
                 startY: 22,
                 head: [['DATE', 'PRF #', 'ASSET', 'WORKSHOP', 'STATUS', 'ETA', 'USER']],
@@ -298,7 +314,7 @@
                 headStyles: { fillColor: [15, 23, 42] },
                 styles: { fontSize: 8 }
             });
-            doc.save("PRF_Status_Report_2026.pdf");
+            doc.save("PRF_Report_2026.pdf");
         };
     </script>
 </body>
