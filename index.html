@@ -16,8 +16,8 @@
         .logo-box { margin-bottom: 50px; padding: 0 10px; border-left: 3px solid var(--brand); padding-left: 15px; }
         .logo-box h1 { font-size: 16px; font-weight: 800; line-height: 1.2; color: #fff; text-transform: uppercase; }
         
-        .nav-btn, .nav-link { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; text-decoration: none; }
-        .nav-btn:hover, .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
+        .nav-btn { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
         
         .presence-box { margin-top: auto; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; }
@@ -66,7 +66,6 @@
     <nav class="sidebar">
         <div class="logo-box"><h1>SRD PRF<br>TRACKING PORTAL</h1></div>
         <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">Live Dashboard</button>
-        <a href="ondock.html" class="nav-link">ON-DOCK</a>
         <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">Completed PRFs</button>
         <button onclick="showAudit()" class="nav-btn">Audit Trail</button>
         <button onclick="exportPDF()" class="nav-btn">Export Report</button>
@@ -217,25 +216,11 @@
         window.openModal = () => document.getElementById('prf-modal').style.display = 'flex';
         window.closeModal = () => document.getElementById('prf-modal').style.display = 'none';
 
-        // UPDATED PDF FUNCTION
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape mode
-            
-            // 1. Filter out COMPLETED items (Only show pending/live work)
+            const doc = new jsPDF('l', 'mm', 'a4');
             const activeLogs = logs.filter(l => l.status !== 'ALL RECEIVED');
-
-            // 2. Map data with full details
-            const tableRows = activeLogs.map(l => [
-                l.date,
-                l.prf,
-                l.asset,
-                l.workshop,
-                l.status,
-                l.eta || 'N/A',
-                l.remarks || ''
-            ]);
-
+            const tableRows = activeLogs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta || 'N/A', l.remarks || '']);
             doc.text("SRD PRF LIVE TRACKING REPORT", 14, 15);
             doc.autoTable({
                 startY: 20,
@@ -243,12 +228,9 @@
                 body: tableRows,
                 theme: 'grid',
                 styles: { fontSize: 8 },
-                headStyles: { fillStyle: [99, 102, 241] }, // Brand color headers
-                columnStyles: {
-                    6: { cellWidth: 80 } // Give remarks column the most space in PDF
-                }
+                headStyles: { fillStyle: [99, 102, 241] },
+                columnStyles: { 6: { cellWidth: 80 } }
             });
-
             doc.save(`SRD_LIVE_REPORT_${new Date().toLocaleDateString()}.pdf`);
         };
     </script>
