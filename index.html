@@ -7,66 +7,56 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
     <style>
-        :root {
-            --bg: #fdfdfd; --side: #0f172a; --brand: #6366f1; --brand-light: #e0e7ff;
-            --success: #10b981; --border: #f1f5f9; --text-main: #1e293b;
-            --text-muted: #64748b; --danger: #f43f5e; --warning: #f59e0b;
-        }
-
+        :root { --bg: #fdfdfd; --side: #0f172a; --brand: #6366f1; --brand-light: #e0e7ff; --success: #10b981; --border: #f1f5f9; --text-main: #1e293b; --text-muted: #64748b; --danger: #f43f5e; --warning: #f59e0b; }
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
-
-        /* Sidebar */
+        
         .sidebar { width: 280px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 40px 20px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 100; }
         .logo-box { margin-bottom: 50px; padding: 0 10px; border-left: 3px solid var(--brand); padding-left: 15px; }
         .logo-box h1 { font-size: 16px; font-weight: 800; line-height: 1.2; color: #fff; text-transform: uppercase; }
-
-        .nav-btn { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
+        
+        .nav-btn, .nav-link { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; text-decoration: none; }
+        .nav-btn:hover, .nav-link:hover { background: rgba(255,255,255,0.05); color: white; }
         .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
-
+        
         .presence-box { margin-top: auto; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; }
         .u-row { font-size: 10px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
         .u-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
-
-        /* Content Area */
-        .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #f8fafc; }
-        .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        
+        .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #f8fafc; overflow: hidden; }
+        .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .search-wrap input { width: 400px; padding: 12px 20px; border-radius: 14px; border: 1px solid var(--border); background: #f8fafc; font-size: 13px; }
-
+        
         .main-content { flex: 1; padding: 30px 40px; overflow: auto; }
-        .table-container { background: white; border-radius: 20px; box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 1250px; table-layout: fixed; }
-        thead th { position: sticky; top: 0; z-index: 10; background: #fbfcfd; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
+        .table-container { background: white; border-radius: 20px; box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); min-width: fit-content; }
+        
+        table { width: 100%; border-collapse: collapse; table-layout: auto; }
+        thead th { position: sticky; top: 0; z-index: 10; background: #fbfcfd; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); white-space: nowrap; }
         tbody td { padding: 14px 20px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
-
-        /* Badges & Status */
+        
+        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 140px; border: none; cursor: pointer; text-align: center; }
+        .s-PENDING { background: #f1f5f9; color: #475569; }
+        .s-ALL-RECEIVED { background: var(--success); color: white; }
+        
+        .remarks-editor { width: 350px; min-height: 35px; padding: 10px; background: #f8fafc; border-radius: 8px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; border: 1px solid transparent; line-height: 1.4; }
+        .remarks-editor:focus { background: white; border-color: var(--brand-light); outline: none; box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); }
+        
         .cd-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; margin-top: 5px; }
         .cd-overdue { background: #fff1f2; color: var(--danger); }
         .cd-ok { background: #f0fdf4; color: var(--success); }
-        
-        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; text-align: center; }
-        .s-PENDING { background: #f1f5f9; color: #475569; }
-        .s-ALL-RECEIVED { background: var(--success); color: white; }
-
-        .remarks-editor { width: 100%; min-height: 35px; padding: 8px; background: #f8fafc; border-radius: 8px; font-size: 12px; white-space: pre-wrap; word-wrap: break-word; border: 1px solid transparent; }
-        .remarks-editor:focus { background: white; border-color: var(--brand-light); outline: none; }
 
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal { background: white; padding: 40px; border-radius: 24px; width: 500px; }
         .btn-main { padding: 14px 24px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 11px; transition: 0.2s; }
         .btn-primary { background: var(--brand); color: white; }
-        .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
     </style>
 </head>
 <body>
-
     <div id="auth-overlay" style="position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 5000;">
         <div style="background: white; padding: 50px; border-radius: 30px; width: 400px; text-align: center;">
-            <h2 style="font-weight: 800; margin-bottom: 25px; letter-spacing: -1px;">SYSTEM ACCESS</h2>
-            <input type="email" id="login-email" placeholder="Email Address" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border);">
+            <h2 style="font-weight: 800; margin-bottom: 25px;">SYSTEM ACCESS</h2>
+            <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border);">
             <input type="password" id="login-pass" placeholder="Password" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border);">
             <button onclick="handleLogin()" class="btn-main btn-primary" style="width:100%">Authenticate</button>
             <p id="auth-error" style="color:var(--danger); font-size:11px; margin-top:15px; font-weight:800;"></p>
@@ -75,38 +65,33 @@
 
     <nav class="sidebar">
         <div class="logo-box"><h1>SRD PRF<br>TRACKING PORTAL</h1></div>
-        
         <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">Live Dashboard</button>
+        <a href="ondock.html" class="nav-link">ON-DOCK</a>
         <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">Completed PRFs</button>
         <button onclick="showAudit()" class="nav-btn">Audit Trail</button>
         <button onclick="exportPDF()" class="nav-btn">Export Report</button>
         <button onclick="handleLogout()" class="nav-btn" style="margin-top:20px; color: var(--danger);">Sign Out</button>
-        
-        <div class="presence-box">
-            <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 12px; letter-spacing: 1px;">ACTIVE USERS</div>
-            <div id="online-list"></div>
-        </div>
+        <div class="presence-box"><div id="online-list"></div></div>
     </nav>
 
     <div class="wrapper">
         <header class="top-bar">
-            <h2 id="page-title" style="font-weight: 800; font-size: 18px; letter-spacing: -0.5px;">LIVE DASHBOARD</h2>
+            <h2 id="page-title" style="font-weight: 800; font-size: 18px;">LIVE DASHBOARD</h2>
             <div class="search-wrap"><input type="text" id="main-search" placeholder="Search entries..." onkeyup="refreshTable()"></div>
             <button onclick="openModal()" class="btn-main btn-primary">+ Create New</button>
         </header>
-
         <main class="main-content">
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th style="width: 100px;">Date</th>
-                            <th style="width: 130px;">PRF #</th>
-                            <th style="width: 180px;">Asset Name</th>
-                            <th style="width: 100px;">Workshop</th>
-                            <th style="width: 180px;">Status</th>
-                            <th style="width: 150px;">Due Date</th>
-                            <th style="width: auto;">Detailed Remarks</th>
+                            <th style="width: 120px;">PRF #</th>
+                            <th style="width: 200px;">Asset Name</th>
+                            <th style="width: 120px;">Workshop</th>
+                            <th style="width: 160px;">Status</th>
+                            <th style="width: 180px;">Due Date</th>
+                            <th>Detailed Remarks</th>
                             <th style="width: 50px;"></th>
                         </tr>
                     </thead>
@@ -147,25 +132,14 @@
         import { getDatabase, ref, push, onValue, remove, update, onDisconnect, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD612DVL9xvsK1lWVyEB9TehpGJry6Rprw",
-            authDomain: "srd-portal-1234.firebaseapp.com",
-            projectId: "srd-portal-1234",
-            storageBucket: "srd-portal-1234.firebasestorage.app",
-            messagingSenderId: "286585731956",
-            appId: "1:286585731956:web:47641bcf34033b014f4a21"
-        };
-
+        const firebaseConfig = { apiKey: "AIzaSyD612DVL9xvsK1lWVyEB9TehpGJry6Rprw", authDomain: "srd-portal-1234.firebaseapp.com", projectId: "srd-portal-1234", storageBucket: "srd-portal-1234.firebasestorage.app", messagingSenderId: "286585731956", appId: "1:286585731956:web:47641bcf34033b014f4a21" };
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const auth = getAuth(app);
         let logs = [], auditLogs = [], currentPage = 'DASH';
-
         const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
 
-        window.handleLogin = () => {
-            signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value).catch(() => alert("Access Denied"));
-        };
+        window.handleLogin = () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value).catch(() => alert("Access Denied"));
         window.handleLogout = () => signOut(auth);
 
         onAuthStateChanged(auth, user => {
@@ -175,13 +149,9 @@
 
         function setupPresence(user) {
             const myStatusRef = ref(db, `/status/${user.uid}`);
-            onValue(ref(db, '.info/connected'), (snap) => {
-                if (snap.val() === false) return;
-                onDisconnect(myStatusRef).set({ state: 'offline', email: user.email }).then(() => set(myStatusRef, { state: 'online', email: user.email }));
-            });
+            onValue(ref(db, '.info/connected'), (snap) => { if (snap.val()) { onDisconnect(myStatusRef).set({ state: 'offline', email: user.email }).then(() => set(myStatusRef, { state: 'online', email: user.email })); }});
             onValue(ref(db, '/status'), (snap) => {
-                const data = snap.val();
-                let html = '';
+                const data = snap.val(); let html = '';
                 for (let id in data) if (data[id].state === 'online') html += `<div class="u-row"><span class="u-dot"></span>${data[id].email.split('@')[0].toUpperCase()}</div>`;
                 document.getElementById('online-list').innerHTML = html;
             });
@@ -189,15 +159,10 @@
 
         function initData() {
             onValue(ref(db, 'prf_logs'), snap => {
-                const val = snap.val();
-                logs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
-                logs.sort((a,b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
-                refreshTable();
+                const val = snap.val(); logs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
+                logs.sort((a,b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0)); refreshTable();
             });
-            onValue(ref(db, 'audit_trail'), snap => {
-                const val = snap.val();
-                auditLogs = val ? Object.values(val).reverse() : [];
-            });
+            onValue(ref(db, 'audit_trail'), snap => { const val = snap.val(); auditLogs = val ? Object.values(val).reverse() : []; });
         }
 
         window.switchPage = (page) => {
@@ -210,8 +175,7 @@
 
         function getCountdown(etaStr) {
             if (!etaStr) return '';
-            const today = new Date(); today.setHours(0,0,0,0);
-            const due = new Date(etaStr); due.setHours(0,0,0,0);
+            const today = new Date(); today.setHours(0,0,0,0); const due = new Date(etaStr); due.setHours(0,0,0,0);
             const diff = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
             if (diff === 0) return `<span class="cd-badge" style="background:#fff7ed; color:#c2410c;">DUE TODAY</span>`;
             if (diff < 0) return `<span class="cd-badge cd-overdue">${Math.abs(diff)}D OVERDUE</span>`;
@@ -221,29 +185,15 @@
         window.refreshTable = () => {
             const q = document.getElementById('main-search').value.toUpperCase();
             const filtered = logs.filter(l => {
-                const matchesSearch = (l.prf?.includes(q) || l.asset?.includes(q));
-                const isCompleted = l.status === 'ALL RECEIVED';
-                return currentPage === 'DASH' ? (matchesSearch && !isCompleted) : (matchesSearch && isCompleted);
+                const matches = (l.prf?.includes(q) || l.asset?.includes(q));
+                return currentPage === 'DASH' ? (matches && l.status !== 'ALL RECEIVED') : (matches && l.status === 'ALL RECEIVED');
             });
-
             document.getElementById('table-body').innerHTML = filtered.map(l => `
-                <tr>
-                    <td>${l.date}</td>
-                    <td style="font-weight:800; color:var(--brand);">${l.prf}</td>
-                    <td style="font-weight:700;">${l.asset}</td>
-                    <td><span style="font-size:10px; font-weight:800; background:#f1f5f9; padding:4px 8px; border-radius:6px;">${l.workshop}</span></td>
-                    <td>
-                        <select class="status-select s-${l.status.replace(/[/ ]/g, '-')}" onchange="updateField('${l.id}', 'status', this.value, '${l.prf}')">
-                            ${STATUS_OPTIONS.map(o => `<option ${l.status==o?'selected':''}>${o}</option>`).join('')}
-                        </select>
-                    </td>
-                    <td>
-                        <input type="date" value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')" style="border:none; background:none; font-family:inherit; font-weight:700;">
-                        ${getCountdown(l.eta)}
-                    </td>
-                    <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
-                    <td><button onclick="deleteRow('${l.id}')" style="background:none; border:none; color:#cbd5e1; cursor:pointer; font-size:18px;">×</button></td>
-                </tr>
+                <tr><td>${l.date}</td><td style="font-weight:800; color:var(--brand);">${l.prf}</td><td style="font-weight:700;">${l.asset}</td><td>${l.workshop}</td>
+                <td><select class="status-select s-${l.status.replace(/[/ ]/g, '-')}" onchange="updateField('${l.id}', 'status', this.value, '${l.prf}')">${STATUS_OPTIONS.map(o => `<option ${l.status==o?'selected':''}>${o}</option>`).join('')}</select></td>
+                <td><input type="date" value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')" style="padding:5px; border:1px solid #eee; border-radius:5px;">${getCountdown(l.eta)}</td>
+                <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
+                <td><button onclick="deleteRow('${l.id}')" style="background:none; border:none; cursor:pointer; color:#ccc;">×</button></td></tr>
             `).join('');
         };
 
@@ -253,29 +203,53 @@
         };
 
         window.savePRF = (redirect) => {
-            const p = document.getElementById('m-prf').value.toUpperCase();
-            const a = document.getElementById('m-asset').value.toUpperCase();
-            const w = document.getElementById('m-workshop').value;
-            if(!p || !a || !w) return alert("All fields required");
+            const p = document.getElementById('m-prf').value.toUpperCase(), a = document.getElementById('m-asset').value.toUpperCase(), w = document.getElementById('m-workshop').value;
+            if(!p || !a || !w) return alert("Required");
             push(ref(db, 'prf_logs'), { date: new Date().toLocaleDateString('en-GB'), rawDate: new Date().toISOString(), prf: p, asset: a, workshop: w, status: 'PENDING', eta: '', remarks: '' });
-            closeModal();
-            if(redirect) window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u", "_blank");
+            closeModal(); if(redirect) window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u", "_blank");
         };
 
         window.showAudit = () => {
             document.getElementById('audit-modal').style.display = 'flex';
-            document.getElementById('audit-content').innerHTML = auditLogs.map(a => `<div style="padding:10px; border-bottom:1px solid #f9f9f9; font-size:11px;"><b>${a.time}</b> | ${a.user} modified PRF ${a.prf} (${a.action})</div>`).join('');
+            document.getElementById('audit-content').innerHTML = auditLogs.map(a => `<div style="font-size:11px; padding:10px; border-bottom:1px solid #eee;"><b>${a.time}</b> | ${a.user} updated ${a.prf} (${a.action})</div>`).join('');
         };
-
-        window.deleteRow = (id) => { if(confirm('Permanently delete this record?')) remove(ref(db, `prf_logs/${id}`)); };
+        window.deleteRow = (id) => { if(confirm('Delete?')) remove(ref(db, `prf_logs/${id}`)); };
         window.openModal = () => document.getElementById('prf-modal').style.display = 'flex';
-        window.closeModal = () => { document.getElementById('prf-modal').style.display = 'none'; };
+        window.closeModal = () => document.getElementById('prf-modal').style.display = 'none';
+
+        // UPDATED PDF FUNCTION
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l');
-            const data = logs.filter(l => currentPage === 'DASH' ? l.status !== 'ALL RECEIVED' : l.status === 'ALL RECEIVED');
-            doc.autoTable({ head: [['DATE', 'PRF', 'ASSET', 'STATUS', 'REMARKS']], body: data.map(l => [l.date, l.prf, l.asset, l.status, l.remarks]) });
-            doc.save(`SRD_${currentPage}_REPORT.pdf`);
+            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape mode
+            
+            // 1. Filter out COMPLETED items (Only show pending/live work)
+            const activeLogs = logs.filter(l => l.status !== 'ALL RECEIVED');
+
+            // 2. Map data with full details
+            const tableRows = activeLogs.map(l => [
+                l.date,
+                l.prf,
+                l.asset,
+                l.workshop,
+                l.status,
+                l.eta || 'N/A',
+                l.remarks || ''
+            ]);
+
+            doc.text("SRD PRF LIVE TRACKING REPORT", 14, 15);
+            doc.autoTable({
+                startY: 20,
+                head: [['DATE', 'PRF #', 'ASSET NAME', 'W.SHOP', 'STATUS', 'DUE DATE', 'DETAILED REMARKS']],
+                body: tableRows,
+                theme: 'grid',
+                styles: { fontSize: 8 },
+                headStyles: { fillStyle: [99, 102, 241] }, // Brand color headers
+                columnStyles: {
+                    6: { cellWidth: 80 } // Give remarks column the most space in PDF
+                }
+            });
+
+            doc.save(`SRD_LIVE_REPORT_${new Date().toLocaleDateString()}.pdf`);
         };
     </script>
 </body>
