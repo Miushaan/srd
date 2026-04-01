@@ -18,41 +18,49 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Sidebar */
+        /* Sidebar & Presence */
         .sidebar { width: 280px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 40px 20px; flex-shrink: 0; border-right: 1px solid rgba(255,255,255,0.05); z-index: 100; }
         .logo-box { margin-bottom: 50px; padding: 0 10px; border-left: 3px solid var(--brand); padding-left: 15px; }
         .logo-box h1 { font-size: 18px; font-weight: 800; line-height: 1.2; color: #fff; text-transform: uppercase; }
 
         .nav-btn { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
+        .nav-btn:hover, .nav-btn.active { background: var(--brand); color: white; }
 
-        /* Main Layout */
+        .presence-box { margin-top: auto; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); }
+        .u-row { font-size: 11px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 600; }
+        .u-dot { width: 7px; height: 7px; background: var(--success); border-radius: 50%; box-shadow: 0 0 10px var(--success); }
+
+        /* Main Content */
         .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; background: #f8fafc; }
-        .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
-        .search-wrap { position: relative; width: 450px; }
-        .search-wrap input { width: 100%; padding: 12px 20px; border-radius: 14px; border: 1px solid var(--border); background: #f8fafc; font-size: 14px; }
+        .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .search-wrap input { width: 400px; padding: 12px 20px; border-radius: 14px; border: 1px solid var(--border); background: #f8fafc; font-size: 14px; }
 
-        /* Table Area */
+        /* Table UI */
         .main-content { flex: 1; padding: 30px 40px; overflow: auto; }
-        .table-container { background: white; border-radius: 24px; box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); }
-        table { width: 100%; border-collapse: collapse; min-width: 1200px; table-layout: fixed; }
+        .table-container { background: white; border-radius: 24px; box-shadow: 0 4px 20px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 1250px; table-layout: fixed; }
         thead th { position: sticky; top: 0; z-index: 10; background: #fbfcfd; padding: 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
         tbody td { padding: 16px 20px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
 
-        /* Remarks - Auto Expanding */
-        .remarks-editor { width: 100%; min-height: 40px; padding: 10px; background: #f8fafc; border-radius: 10px; border: 1px solid transparent; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; transition: 0.2s; }
-        .remarks-editor:focus { background: white; border-color: var(--brand-light); outline: none; }
+        /* Countdown Badges */
+        .cd-badge { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 9px; font-weight: 800; margin-top: 8px; }
+        .cd-overdue { background: #fff1f2; color: var(--danger); }
+        .cd-today { background: #fffbeb; color: var(--warning); border: 1px solid #fde68a; animation: blink 2s infinite; }
+        .cd-ok { background: #f0fdf4; color: var(--success); }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.5;} 100% {opacity: 1;} }
 
         /* Status Colors */
-        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; appearance: none; text-align: center; }
+        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 100%; border: none; cursor: pointer; text-align: center; }
         .s-PENDING { background: #f1f5f9; color: #475569; }
-        .s-PO-RAISED { background: #dcfce7; color: #166534; }
         .s-ALL-RECEIVED { background: var(--success); color: white; }
 
-        /* Overlays */
+        /* Remarks Editor */
+        .remarks-editor { width: 100%; min-height: 40px; padding: 10px; background: #f8fafc; border-radius: 10px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; word-wrap: break-word; }
+        .remarks-editor:focus { background: white; border: 1px solid var(--brand-light); outline: none; }
+
+        /* Modals */
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(10px); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .modal { background: white; padding: 45px; border-radius: 28px; width: 550px; max-height: 85vh; display: flex; flex-direction: column; }
+        .modal { background: white; padding: 45px; border-radius: 28px; width: 550px; }
         .btn-main { padding: 16px 28px; border-radius: 14px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 12px; }
         .btn-primary { background: var(--brand); color: white; }
     </style>
@@ -75,7 +83,11 @@
         <button onclick="showAudit()" class="nav-btn">Audit Trail</button>
         <button onclick="exportPDF()" class="nav-btn">Export PDF</button>
         <button onclick="handleLogout()" class="nav-btn" style="margin-top:20px; color: #f43f5e;">Sign Out</button>
-        <div id="online-list" style="margin-top:auto; font-size: 11px; color:#cbd5e1;"></div>
+        
+        <div class="presence-box">
+            <div style="font-size: 9px; font-weight: 800; color: #64748b; margin-bottom: 12px; letter-spacing: 1px;">ACTIVE USERS</div>
+            <div id="online-list"></div>
+        </div>
     </nav>
 
     <div class="wrapper">
@@ -94,7 +106,7 @@
                             <th style="width: 180px;">Asset Name</th>
                             <th style="width: 100px;">Workshop</th>
                             <th style="width: 180px;">Status</th>
-                            <th style="width: 150px;">Due Date</th>
+                            <th style="width: 160px;">Due Date</th>
                             <th style="width: auto;">Detailed Remarks</th>
                             <th style="width: 50px;"></th>
                         </tr>
@@ -105,14 +117,6 @@
         </main>
     </div>
 
-    <div id="audit-modal" class="overlay" onclick="if(event.target===this) this.style.display='none'">
-        <div class="modal">
-            <h2 style="margin-bottom:20px; font-weight:800;">AUDIT TRAIL</h2>
-            <div id="audit-content" style="overflow-y:auto; flex:1; border-top:1px solid #eee; padding-top:10px;"></div>
-            <button onclick="document.getElementById('audit-modal').style.display='none'" class="btn-main" style="margin-top:20px; background:#eee;">Close</button>
-        </div>
-    </div>
-
     <div id="prf-modal" class="overlay" onclick="if(event.target===this) closeModal()">
         <div class="modal">
             <h2 style="margin-bottom:30px; font-weight: 800;">NEW PRF RECORD</h2>
@@ -120,20 +124,22 @@
             <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:16px; margin-bottom:15px; border-radius:14px; border:1px solid var(--border);">
             <select id="m-workshop" style="width:100%; padding:16px; margin-bottom:25px; border-radius:14px; border:1px solid var(--border);">
                 <option value="">-- SELECT WORKSHOP --</option>
-                <option value="DAU/LOS">DAU/LOS</option>
-                <option value="EEW">EEW</option>
-                <option value="MRW">MRW</option>
-                <option value="MSH">MSH</option>
-                <option value="MWU">MWU</option>
-                <option value="NMU">NMU</option>
-                <option value="OSU">OSU</option>
-                <option value="PLU">PLU</option>
-                <option value="SMU">SMU</option>
-                <option value="STU">STU</option>
-                <option value="ADM">ADM</option>
-                <option value="INV">INV</option>
+                <option value="DAU/LOS">DAU/LOS</option><option value="EEW">EEW</option><option value="MRW">MRW</option>
+                <option value="MSH">MSH</option><option value="MWU">MWU</option><option value="NMU">NMU</option>
+                <option value="OSU">OSU</option><option value="PLU">PLU</option><option value="SMU">SMU</option>
+                <option value="STU">STU</option><option value="ADM">ADM</option><option value="INV">INV</option>
             </select>
-            <button onclick="savePRF()" class="btn-main btn-primary" style="width:100%">Save Entry</button>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
+                <button onclick="savePRF(false)" class="btn-main" style="background:#eee;">Draft Only</button>
+                <button onclick="savePRF(true)" class="btn-main btn-primary">Save & Open Form</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="audit-modal" class="overlay" onclick="if(event.target===this) this.style.display='none'">
+        <div class="modal">
+            <h2 style="margin-bottom:20px; font-weight:800;">AUDIT TRAIL</h2>
+            <div id="audit-content" style="overflow-y:auto; flex:1; max-height:400px; border-top:1px solid #eee; padding-top:10px;"></div>
         </div>
     </div>
 
@@ -165,8 +171,22 @@
 
         onAuthStateChanged(auth, user => {
             document.getElementById('auth-overlay').style.display = user ? 'none' : 'flex';
-            if(user) { initData(); }
+            if(user) { initData(); setupPresence(user); }
         });
+
+        function setupPresence(user) {
+            const myStatusRef = ref(db, `/status/${user.uid}`);
+            onValue(ref(db, '.info/connected'), (snap) => {
+                if (snap.val() === false) return;
+                onDisconnect(myStatusRef).set({ state: 'offline', email: user.email }).then(() => set(myStatusRef, { state: 'online', email: user.email }));
+            });
+            onValue(ref(db, '/status'), (snap) => {
+                const data = snap.val();
+                let html = '';
+                for (let id in data) if (data[id].state === 'online') html += `<div class="u-row"><span class="u-dot"></span>${data[id].email.split('@')[0].toUpperCase()}</div>`;
+                document.getElementById('online-list').innerHTML = html;
+            });
+        }
 
         function initData() {
             onValue(ref(db, 'prf_logs'), snap => {
@@ -179,6 +199,16 @@
                 const val = snap.val();
                 auditLogs = val ? Object.values(val).reverse() : [];
             });
+        }
+
+        function getCountdown(etaStr) {
+            if (!etaStr) return '';
+            const today = new Date(); today.setHours(0,0,0,0);
+            const due = new Date(etaStr); due.setHours(0,0,0,0);
+            const diff = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
+            if (diff === 0) return `<span class="cd-badge cd-today">DUE TODAY</span>`;
+            if (diff < 0) return `<span class="cd-badge cd-overdue">${Math.abs(diff)}D OVERDUE</span>`;
+            return `<span class="cd-badge cd-ok">${diff}D REMAINING</span>`;
         }
 
         window.refreshTable = () => {
@@ -195,41 +225,34 @@
                             ${STATUS_OPTIONS.map(o => `<option ${l.status==o?'selected':''}>${o}</option>`).join('')}
                         </select>
                     </td>
-                    <td><input type="date" value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')"></td>
+                    <td>
+                        <input type="date" value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')">
+                        ${getCountdown(l.eta)}
+                    </td>
                     <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
-                    <td><button onclick="deleteRow('${l.id}')">×</button></td>
+                    <td><button onclick="deleteRow('${l.id}')" style="background:none; border:none; cursor:pointer;">×</button></td>
                 </tr>
             `).join('');
         };
 
         window.updateField = (id, field, val, prf) => {
             update(ref(db, `prf_logs/${id}`), { [field]: val });
-            push(ref(db, 'audit_trail'), {
-                time: new Date().toLocaleString(),
-                user: auth.currentUser.email.split('@')[0].toUpperCase(),
-                action: `Updated ${field}`,
-                prf: prf,
-                details: val
-            });
+            push(ref(db, 'audit_trail'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `Updated ${field}`, prf: prf, details: val });
+        };
+
+        window.savePRF = (redirect) => {
+            const p = document.getElementById('m-prf').value.toUpperCase();
+            const a = document.getElementById('m-asset').value.toUpperCase();
+            const w = document.getElementById('m-workshop').value;
+            if(!p || !a || !w) return alert("Missing Info");
+            push(ref(db, 'prf_logs'), { date: new Date().toLocaleDateString('en-GB'), rawDate: new Date().toISOString(), prf: p, asset: a, workshop: w, status: 'PENDING', eta: '', remarks: '' });
+            closeModal();
+            if(redirect) window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u", "_blank");
         };
 
         window.showAudit = () => {
             document.getElementById('audit-modal').style.display = 'flex';
-            document.getElementById('audit-content').innerHTML = auditLogs.slice(0, 50).map(a => `
-                <div style="padding:10px; border-bottom:1px solid #f9f9f9; font-size:11px;">
-                    <b style="color:var(--brand)">${a.time}</b> | <b>${a.user}</b><br>
-                    PRF: ${a.prf} -> <span style="color:var(--danger)">${a.action}</span> (${a.details})
-                </div>
-            `).join('');
-        };
-
-        window.savePRF = () => {
-            const p = document.getElementById('m-prf').value.toUpperCase();
-            const a = document.getElementById('m-asset').value.toUpperCase();
-            const w = document.getElementById('m-workshop').value;
-            if(!p || !a || !w) return;
-            push(ref(db, 'prf_logs'), { date: new Date().toLocaleDateString('en-GB'), rawDate: new Date().toISOString(), prf: p, asset: a, workshop: w, status: 'PENDING', eta: '', remarks: '' });
-            closeModal();
+            document.getElementById('audit-content').innerHTML = auditLogs.map(a => `<div style="padding:10px; border-bottom:1px solid #eee; font-size:11px;"><b>${a.time}</b> | ${a.user} updated PRF ${a.prf} (${a.action})</div>`).join('');
         };
 
         window.deleteRow = (id) => { if(confirm('Delete?')) remove(ref(db, `prf_logs/${id}`)); };
