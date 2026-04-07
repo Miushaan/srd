@@ -88,7 +88,7 @@
         <div style="flex: 1;">
             <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">Live Dashboard</button>
             <button id="nav-yard" onclick="switchPage('YARD')" class="nav-btn">Boat Yard Log</button>
-            <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">Archive</button>
+            <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">COMPLETED</button>
         </div>
         <div class="presence-box"><div id="online-list"></div></div>
         <button onclick="handleLogout()" class="nav-btn" style="color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2);">Sign Out</button>
@@ -99,7 +99,7 @@
             <div class="header-info"><h2 id="page-title">LIVE DASHBOARD</h2></div>
             <div class="search-wrap"><input type="text" id="main-search" placeholder="Search records..." onkeyup="refreshTable()"></div>
             <div class="action-group">
-                <button onclick="showAudit()" class="btn-main btn-outline">Audit Trail</button>
+                <button onclick="showAudit()" class="btn-main btn-outline">Transactions</button>
                 <button onclick="exportPDF()" class="btn-main btn-outline">Export PDF</button>
                 <button onclick="openModal()" class="btn-main btn-primary">+ Create Entry</button>
             </div>
@@ -147,7 +147,7 @@
     <div id="audit-modal" class="overlay" onclick="if(event.target===this) this.style.display='none'">
         <div class="modal" style="width: 650px; max-height: 80vh; display: flex; flex-direction: column;">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                <h2 style="font-weight:800;">AUDIT TRAIL</h2>
+                <h2 style="font-weight:800;">Transactions</h2>
                 <button onclick="document.getElementById('audit-modal').style.display='none'" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
             </div>
             <div id="audit-content" style="overflow-y:auto; flex:1; border-top:1px solid #eee; padding-top:10px;"></div>
@@ -215,7 +215,7 @@
             currentPage = page;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('nav-' + page.toLowerCase()).classList.add('active');
-            document.getElementById('page-title').innerText = page === 'YARD' ? 'BOAT YARD LOG' : (page === 'DASH' ? 'LIVE DASHBOARD' : 'ARCHIVE');
+            document.getElementById('page-title').innerText = page === 'YARD' ? 'BOAT YARD LOG' : (page === 'DASH' ? 'LIVE DASHBOARD' : 'COMPLETED');
             refreshTable();
         };
 
