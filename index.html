@@ -17,7 +17,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        /* Sidebar Navigation */
         .sidebar { width: 260px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 40px 20px; flex-shrink: 0; z-index: 100; }
         .logo-box { margin-bottom: 50px; padding-left: 15px; border-left: 3px solid var(--brand); }
         .logo-box h1 { font-size: 14px; font-weight: 800; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
@@ -30,7 +29,6 @@
         .u-row { font-size: 10px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
         .u-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
 
-        /* Main Wrapper */
         .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
         .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px; }
         
@@ -42,7 +40,6 @@
 
         .action-group { display: flex; gap: 10px; margin-left: auto; }
 
-        /* Content Area */
         .main-content { flex: 1; padding: 30px 40px; overflow: auto; }
         .table-container { background: white; border-radius: 20px; box-shadow: 0 4px 25px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; }
 
@@ -50,32 +47,28 @@
         thead th { position: sticky; top: 0; background: #f8fafc; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
         tbody td { padding: 12px 20px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
 
-        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 150px; border: none; cursor: pointer; text-align: center; }
+        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 140px; border: none; cursor: pointer; text-align: center; }
         
-        /* Status Themes */
-        .s-PENDING { background: #f1f5f9; color: #475569; }
+        .s-PENDING, .s-Undocked { background: #f1f5f9; color: #475569; }
         .s-ITEM-CREATION { background: #e0e7ff; color: #4338ca; }
         .s-PR-MTR-RAISED { background: #fef9c3; color: #854d0e; }
-        .s-PO-RAISED { background: #dcfce7; color: #166534; }
+        .s-PO-RAISED, .s-Docked { background: #dcfce7; color: #166534; }
         .s-PAYMENT-PENDING { background: #ffedd5; color: #9a3412; }
         .s-PART-RECEIVED { background: #f0fdf4; color: #15803d; border: 1px dashed #10b981; }
         .s-ALL-RECEIVED { background: var(--success); color: white; }
         .s-OH-HOLD { background: #fee2e2; color: #991b1b; }
         .s-CANCELLED { background: #1e293b; color: white; }
 
-        .remarks-editor { width: 100%; min-width: 250px; min-height: 38px; padding: 10px; background: #f8fafc; border-radius: 8px; font-size: 12px; border: 1px solid transparent; }
+        .remarks-editor { width: 100%; padding: 8px; background: #f8fafc; border-radius: 8px; font-size: 12px; border: 1px solid transparent; font-family: inherit; }
         .remarks-editor:focus { background: white; border-color: var(--brand); }
         
-        .cd-badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 9px; font-weight: 800; margin-top: 5px; }
-        .cd-overdue { background: #fff1f2; color: var(--danger); }
-        .cd-ok { background: #f0fdf4; color: var(--success); }
-
-        /* Components */
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
         .modal { background: white; padding: 40px; border-radius: 24px; width: 500px; }
         .btn-main { padding: 12px 20px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 10px; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--brand); color: white; }
         .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-main); }
+        
+        .age-badge { font-weight: 800; font-size: 12px; color: var(--brand); background: var(--brand-light); padding: 4px 10px; border-radius: 6px; }
     </style>
 </head>
 <body>
@@ -92,29 +85,19 @@
 
     <nav class="sidebar">
         <div class="logo-box"><h1>SRD PRF<br>PORTAL 2026</h1></div>
-        
         <div style="flex: 1;">
             <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">Live Dashboard</button>
+            <button id="nav-yard" onclick="switchPage('YARD')" class="nav-btn">Boat Yard Log</button>
             <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">Archive</button>
         </div>
-
-        <div class="presence-box">
-            <div id="online-list"></div>
-        </div>
-
+        <div class="presence-box"><div id="online-list"></div></div>
         <button onclick="handleLogout()" class="nav-btn" style="color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2);">Sign Out</button>
     </nav>
 
     <div class="wrapper">
         <header class="top-bar">
-            <div class="header-info">
-                <h2 id="page-title">LIVE DASHBOARD</h2>
-            </div>
-
-            <div class="search-wrap">
-                <input type="text" id="main-search" placeholder="Search records..." onkeyup="refreshTable()">
-            </div>
-
+            <div class="header-info"><h2 id="page-title">LIVE DASHBOARD</h2></div>
+            <div class="search-wrap"><input type="text" id="main-search" placeholder="Search records..." onkeyup="refreshTable()"></div>
             <div class="action-group">
                 <button onclick="showAudit()" class="btn-main btn-outline">Audit Trail</button>
                 <button onclick="exportPDF()" class="btn-main btn-outline">Export PDF</button>
@@ -125,46 +108,48 @@
         <main class="main-content">
             <div class="table-container">
                 <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 100px;">Date</th>
-                            <th style="width: 120px;">PRF #</th>
-                            <th style="width: 200px;">Asset Name</th>
-                            <th style="width: 100px;">Workshop</th>
-                            <th style="width: 160px;">Status</th>
-                            <th style="width: 180px;">Due Date</th>
-                            <th>Remarks</th>
-                            <th style="width: 50px;"></th>
-                        </tr>
-                    </thead>
+                    <thead id="table-head"></thead>
                     <tbody id="table-body"></tbody>
                 </table>
             </div>
         </main>
     </div>
 
-    <div id="prf-modal" class="overlay" onclick="if(event.target===this) closeModal()">
+    <div id="entry-modal" class="overlay" onclick="if(event.target===this) closeModal()">
         <div class="modal">
-            <h2 style="margin-bottom:25px; font-weight: 800;">NEW ENTRY</h2>
-            <input type="text" id="m-prf" placeholder="PRF NUMBER" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border);">
-            <input type="text" id="m-asset" placeholder="ASSET NAME" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border);">
-            <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border);">
-                <option value="">-- SELECT WORKSHOP --</option>
-                <option value="DAU/LOS">DAU/LOS</option><option value="EEW">EEW</option><option value="MRW">MRW</option>
-                <option value="MSH">MSH</option><option value="MWU">MWU</option><option value="NMU">NMU</option>
-                <option value="OSU">OSU</option><option value="PLU">PLU</option><option value="SMU">SMU</option>
-                <option value="STU">STU</option><option value="ADM">ADM</option><option value="INV">INV</option>
-            </select>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-                <button onclick="savePRF(false)" class="btn-main btn-outline" style="justify-content:center;">Draft</button>
-                <button onclick="savePRF(true)" class="btn-main btn-primary" style="justify-content:center;">Upload & Link</button>
+            <h2 id="modal-title" style="margin-bottom:25px; font-weight: 800;">NEW ENTRY</h2>
+            <div id="prf-form">
+                <input type="text" id="m-prf" placeholder="PRF NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="m-asset" placeholder="ASSET NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border);">
+                    <option value="">-- SELECT WORKSHOP --</option>
+                    <option value="DAU/LOS">DAU/LOS</option><option value="EEW">EEW</option><option value="MRW">MRW</option>
+                    <option value="MSH">MSH</option><option value="MWU">MWU</option><option value="NMU">NMU</option>
+                    <option value="OSU">OSU</option><option value="PLU">PLU</option><option value="SMU">SMU</option>
+                    <option value="STU">STU</option><option value="ADM">ADM</option><option value="INV">INV</option>
+                </select>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+                    <button onclick="savePRF(false)" class="btn-main btn-outline" style="justify-content:center;">Draft</button>
+                    <button onclick="savePRF(true)" class="btn-main btn-primary" style="justify-content:center;">Upload & Link</button>
+                </div>
+            </div>
+            <div id="yard-form" style="display:none;">
+                <input type="text" id="y-slot" placeholder="SLOT NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="y-vessel" placeholder="VESSEL NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="y-owner" placeholder="OWNER NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                <label style="font-size: 10px; font-weight: 800; color: var(--text-muted);">DOCKING DATE</label>
+                <input type="date" id="y-docked" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border);">
+                <button onclick="saveYardEntry()" class="btn-main btn-primary" style="width:100%; justify-content:center;">Register Vessel</button>
             </div>
         </div>
     </div>
 
     <div id="audit-modal" class="overlay" onclick="if(event.target===this) this.style.display='none'">
         <div class="modal" style="width: 650px; max-height: 80vh; display: flex; flex-direction: column;">
-            <h2 style="margin-bottom:20px; font-weight:800;">AUDIT TRAIL</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2 style="font-weight:800;">AUDIT TRAIL</h2>
+                <button onclick="document.getElementById('audit-modal').style.display='none'" style="background:none; border:none; font-size:24px; cursor:pointer;">&times;</button>
+            </div>
             <div id="audit-content" style="overflow-y:auto; flex:1; border-top:1px solid #eee; padding-top:10px;"></div>
         </div>
     </div>
@@ -188,13 +173,12 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
         
-        let logs = [], auditLogs = [], currentPage = 'DASH';
+        let logs = [], yardLogs = [], auditLogs = [], currentPage = 'DASH';
         const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
+        const YARD_STATUS = ["Docked", "Undocked"];
 
-        // Auth
         window.handleLogin = () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value).catch(() => alert("Access Denied"));
         window.handleLogout = () => signOut(auth);
-
         onAuthStateChanged(auth, user => {
             document.getElementById('auth-overlay').style.display = user ? 'none' : 'flex';
             if(user) { initData(); setupPresence(user); }
@@ -214,8 +198,12 @@
             onValue(ref(db, 'prf_logs'), snap => {
                 const val = snap.val();
                 logs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
-                logs.sort((a,b) => new Date(b.rawDate || 0) - new Date(a.rawDate || 0));
-                refreshTable();
+                if(currentPage !== 'YARD') refreshTable();
+            });
+            onValue(ref(db, 'yard_logs'), snap => {
+                const val = snap.val();
+                yardLogs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
+                if(currentPage === 'YARD') refreshTable();
             });
             onValue(ref(db, 'audit_trail'), snap => {
                 const val = snap.val();
@@ -225,33 +213,48 @@
 
         window.switchPage = (page) => {
             currentPage = page;
-            document.getElementById('nav-dash').classList.toggle('active', page === 'DASH');
-            document.getElementById('nav-comp').classList.toggle('active', page === 'COMP');
-            document.getElementById('page-title').innerText = page === 'DASH' ? 'LIVE DASHBOARD' : 'ARCHIVE';
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('nav-' + page.toLowerCase()).classList.add('active');
+            document.getElementById('page-title').innerText = page === 'YARD' ? 'BOAT YARD LOG' : (page === 'DASH' ? 'LIVE DASHBOARD' : 'ARCHIVE');
             refreshTable();
         };
 
-        function getCountdown(etaStr) {
-            if (!etaStr) return '';
-            const today = new Date(); today.setHours(0,0,0,0);
-            const due = new Date(etaStr); due.setHours(0,0,0,0);
-            const diff = Math.ceil((due - today) / (1000 * 60 * 60 * 24));
-            if (diff === 0) return `<span class="cd-badge" style="background:#fff7ed; color:#c2410c;">DUE TODAY</span>`;
-            if (diff < 0) return `<span class="cd-badge cd-overdue">${Math.abs(diff)}D OVERDUE</span>`;
-            return `<span class="cd-badge cd-ok">${diff}D REMAINING</span>`;
-        }
-
         window.refreshTable = () => {
             const q = document.getElementById('main-search').value.toUpperCase();
-            const filtered = logs.filter(l => {
-                const matches = (l.prf?.includes(q) || l.asset?.includes(q) || l.workshop?.includes(q));
-                return currentPage === 'DASH' ? (matches && l.status !== 'ALL RECEIVED') : (matches && l.status === 'ALL RECEIVED');
-            });
+            const head = document.getElementById('table-head');
+            const body = document.getElementById('table-body');
 
-            document.getElementById('table-body').innerHTML = filtered.map(l => {
-                const sClass = `s-${l.status.replace(/[/ ]/g, '-')}`;
-                return `
-                    <tr>
+            if (currentPage === 'YARD') {
+                head.innerHTML = `<tr><th style="width:80px;">Slot</th><th>Vessel Name</th><th>Owner</th><th style="width:120px;">Docked</th><th style="width:150px;">Status</th><th style="width:80px;">Age</th><th>Undock Date</th><th style="width:40px;"></th></tr>`;
+                const filtered = yardLogs.filter(l => l.name?.toUpperCase().includes(q) || l.owner?.toUpperCase().includes(q) || l.slot?.toUpperCase().includes(q));
+                body.innerHTML = filtered.map(l => {
+                    const start = new Date(l.docked);
+                    const end = l.undocked ? new Date(l.undocked) : new Date();
+                    const age = Math.floor((end - start) / (1000 * 60 * 60 * 24)) || 0;
+                    return `<tr>
+                        <td style="font-weight:800; color:var(--brand);"><input class="remarks-editor" value="${l.slot}" onblur="updateYard('${l.id}', 'slot', this.value)"></td>
+                        <td><input class="remarks-editor" value="${l.name}" style="font-weight:700;" onblur="updateYard('${l.id}', 'name', this.value)"></td>
+                        <td><input class="remarks-editor" value="${l.owner}" onblur="updateYard('${l.id}', 'owner', this.value)"></td>
+                        <td><input type="date" value="${l.docked}" class="remarks-editor" onchange="updateYard('${l.id}', 'docked', this.value)"></td>
+                        <td>
+                            <select class="status-select ${l.status === 'Docked' ? 's-Docked' : 's-Undocked'}" onchange="updateYard('${l.id}', 'status', this.value)">
+                                ${YARD_STATUS.map(o => `<option ${l.status==o?'selected':''}>${o}</option>`).join('')}
+                            </select>
+                        </td>
+                        <td><span class="age-badge">${age}D</span></td>
+                        <td><input type="date" value="${l.undocked || ''}" class="remarks-editor" onchange="updateYard('${l.id}', 'undocked', this.value)"></td>
+                        <td><button onclick="deleteYard('${l.id}')" style="background:none; border:none; cursor:pointer; color:var(--danger); font-size:18px;">&times;</button></td>
+                    </tr>`;
+                }).join('');
+            } else {
+                head.innerHTML = `<tr><th style="width:100px;">Date</th><th style="width:120px;">PRF #</th><th>Asset Name</th><th style="width:100px;">Workshop</th><th style="width:160px;">Status</th><th style="width:140px;">Due Date</th><th>Remarks</th><th style="width:40px;"></th></tr>`;
+                const filtered = logs.filter(l => {
+                    const matches = (l.prf?.toUpperCase().includes(q) || l.asset?.toUpperCase().includes(q) || l.workshop?.toUpperCase().includes(q));
+                    return currentPage === 'DASH' ? (matches && l.status !== 'ALL RECEIVED') : (matches && l.status === 'ALL RECEIVED');
+                });
+                body.innerHTML = filtered.map(l => {
+                    const sClass = `s-${l.status.replace(/[/ ]/g, '-')}`;
+                    return `<tr>
                         <td>${l.date}</td>
                         <td style="font-weight:800; color:var(--brand);">${l.prf}</td>
                         <td style="font-weight:700;">${l.asset}</td>
@@ -261,21 +264,12 @@
                                 ${STATUS_OPTIONS.map(o => `<option ${l.status==o?'selected':''}>${o}</option>`).join('')}
                             </select>
                         </td>
-                        <td>
-                            <input type="date" value="${l.eta || ''}" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')" style="padding:5px; border:1px solid #eee; border-radius:5px; font-family:inherit;">
-                            ${getCountdown(l.eta)}
-                        </td>
+                        <td><input type="date" value="${l.eta || ''}" class="remarks-editor" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')"></td>
                         <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
                         <td><button onclick="deleteRow('${l.id}')" style="background:none; border:none; cursor:pointer; color:#cbd5e1; font-size:18px;">&times;</button></td>
-                    </tr>
-                `;
-            }).join('');
-        };
-
-        window.updateField = (id, field, val, prf) => {
-            if (field === 'status' && val === 'ALL RECEIVED' && !confirm('Move to Archive?')) { refreshTable(); return; }
-            update(ref(db, `prf_logs/${id}`), { [field]: val });
-            push(ref(db, 'audit_trail'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `Edit ${field}`, prf: prf, details: val });
+                    </tr>`;
+                }).join('');
+            }
         };
 
         window.savePRF = (redirect) => {
@@ -286,24 +280,77 @@
             if(redirect) window.open("https://forms.office.com/pages/responsepage.aspx?id=rS-35FLkcEy4rMmBiUUcM-wq0ZU8I9BHssORFyfEW95UN0ZMM1gxR1YwUDZKMkNHMkhFMUdMRzlRSS4u", "_blank");
         };
 
+        window.saveYardEntry = () => {
+            const s = document.getElementById('y-slot').value, v = document.getElementById('y-vessel').value, o = document.getElementById('y-owner').value, d = document.getElementById('y-docked').value;
+            if(!s || !v || !d) return alert("Required");
+            push(ref(db, 'yard_logs'), { slot: s, name: v, owner: o, docked: d, status: 'Docked', undocked: '' });
+            closeModal();
+        };
+
+        window.updateField = (id, field, val, prf) => {
+            update(ref(db, `prf_logs/${id}`), { [field]: val });
+            push(ref(db, 'audit_trail'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `PRF Edit: ${field}`, prf: prf, details: val });
+        };
+
+        window.updateYard = (id, field, val) => {
+            const upd = { [field]: val };
+            if (field === 'undocked' && val !== "") upd.status = "Undocked";
+            update(ref(db, `yard_logs/${id}`), upd);
+            push(ref(db, 'audit_trail'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `Yard Edit: ${field}`, prf: 'YARD', details: val });
+        };
+
+        window.openModal = () => {
+            const isYard = currentPage === 'YARD';
+            document.getElementById('modal-title').innerText = isYard ? 'REGISTER VESSEL' : 'NEW PRF ENTRY';
+            document.getElementById('prf-form').style.display = isYard ? 'none' : 'block';
+            document.getElementById('yard-form').style.display = isYard ? 'block' : 'none';
+            document.getElementById('entry-modal').style.display = 'flex';
+        };
+
+        window.closeModal = () => document.getElementById('entry-modal').style.display = 'none';
+        window.deleteRow = (id) => { if(confirm('Delete permanently?')) remove(ref(db, `prf_logs/${id}`)); };
+        window.deleteYard = (id) => { if(confirm('Delete vessel?')) remove(ref(db, `yard_logs/${id}`)); };
+
         window.showAudit = () => {
             document.getElementById('audit-modal').style.display = 'flex';
             document.getElementById('audit-content').innerHTML = auditLogs.map(a => `<div style="font-size:11px; padding:12px; border-bottom:1px solid #f1f5f9;"><span style="color:var(--text-muted);">${a.time}</span> | <b>${a.user}</b>: ${a.prf} (${a.action} ➔ ${a.details})</div>`).join('');
         };
 
-        window.deleteRow = (id) => { if(confirm('Delete permanently?')) remove(ref(db, `prf_logs/${id}`)); };
-        window.openModal = () => document.getElementById('prf-modal').style.display = 'flex';
-        window.closeModal = () => { document.getElementById('prf-modal').style.display = 'none'; };
-
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
-            const data = logs.filter(l => l.status !== 'ALL RECEIVED').map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta || 'N/A', l.remarks || '']);
-            doc.text("SRD PRF STATUS REPORT", 14, 15);
+            let data, head;
+            const dateStr = new Date().toLocaleString('en-GB');
+
+            if(currentPage === 'YARD') {
+                head = [['SLOT', 'VESSEL NAME', 'OWNER', 'DOCKED DATE', 'STATUS', 'AGE (DAYS)', 'UNDOCK DATE']];
+                data = yardLogs.map(l => {
+                    const start = new Date(l.docked);
+                    const end = l.undocked ? new Date(l.undocked) : new Date();
+                    const age = Math.floor((end - start) / (1000 * 60 * 60 * 24)) || 0;
+                    return [l.slot, l.name, l.owner, l.docked, l.status, age + " Days", l.undocked || 'N/A'];
+                });
+            } else {
+                head = [['DATE', 'PRF #', 'ASSET NAME', 'WORKSHOP', 'STATUS', 'DUE DATE', 'REMARKS']];
+                const filterLogs = logs.filter(l => currentPage === 'DASH' ? l.status !== 'ALL RECEIVED' : l.status === 'ALL RECEIVED');
+                data = filterLogs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta || 'N/A', l.remarks || '']);
+            }
+
+            doc.setFontSize(18);
+            doc.text(`SRD PORTAL: ${currentPage} REPORT`, 14, 15);
             doc.setFontSize(10);
-            doc.text(`Report Date: ${new Date().toLocaleDateString('en-GB')}`, 14, 22);
-            doc.autoTable({ startY: 28, head: [['DATE', 'PRF #', 'ASSET', 'W.SHOP', 'STATUS', 'DUE DATE', 'REMARKS']], body: data, theme: 'grid', styles: { fontSize: 7 }, headStyles: { fillStyle: [99, 102, 241] }});
-            doc.save(`SRD_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.text(`Report Exported On: ${dateStr}`, 14, 22);
+            
+            doc.autoTable({ 
+                startY: 28, 
+                head: head, 
+                body: data, 
+                theme: 'grid',
+                headStyles: { fillStyle: [99, 102, 241], textColor: [255, 255, 255], fontStyle: 'bold' },
+                styles: { fontSize: 8, cellPadding: 3 }
+            });
+
+            doc.save(`SRD_${currentPage}_Report_${new Date().toISOString().split('T')[0]}.pdf`);
         };
     </script>
 </body>
