@@ -14,7 +14,7 @@
             --brand: #6366f1; 
             --brand-light: #e0e7ff; 
             --success: #10b981; 
-            --border: #cbd5e1; /* Darkened for more visibility */
+            --border: #cbd5e1; 
             --text-main: #1e293b; 
             --text-muted: #64748b; 
             --danger: #f43f5e; 
@@ -33,7 +33,7 @@
             padding: 40px 20px; 
             flex-shrink: 0; 
             z-index: 100; 
-            border-right: 2px solid rgba(255,255,255,0.1); /* Visible sidebar edge */
+            border-right: 2px solid rgba(255,255,255,0.1); 
         }
         .logo-box { margin-bottom: 50px; padding-left: 15px; border-left: 4px solid var(--brand); }
         .logo-box h1 { font-size: 14px; font-weight: 800; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
@@ -79,7 +79,20 @@
         .s-OH-HOLD { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
         .s-CANCELLED { background: #1e293b; color: white; }
 
-        .remarks-editor { width: 100%; padding: 8px; background: #f8fafc; border-radius: 8px; font-size: 12px; border: 1px solid var(--border); font-family: inherit; transition: 0.2s; }
+        .remarks-editor { 
+            width: 100%; 
+            padding: 10px; 
+            background: #f8fafc; 
+            border-radius: 8px; 
+            font-size: 12px; 
+            border: 1px solid var(--border); 
+            font-family: inherit; 
+            transition: 0.2s; 
+            white-space: pre-wrap; 
+            word-break: break-word; 
+            line-height: 1.5;
+            min-height: 36px;
+        }
         .remarks-editor:focus { background: white; border-color: var(--brand); border-width: 1px; box-shadow: 0 0 0 2px var(--brand-light); }
         
         .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
@@ -90,6 +103,8 @@
         .btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
         .btn-outline { background: white; border-color: var(--border); color: var(--text-main); }
         .btn-outline:hover { background: #f1f5f9; border-color: var(--text-muted); }
+        .btn-completed { color: var(--success); border-color: var(--success); }
+        .btn-completed.active-toggle { background: var(--success); color: white; }
         
         .age-badge { font-weight: 800; font-size: 11px; color: var(--brand); background: var(--brand-light); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--brand); }
     </style>
@@ -112,7 +127,6 @@
             <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">PRF TRACKER</button>
             <button id="nav-yard" onclick="switchPage('YARD')" class="nav-btn">Boat Yard Log</button>
             <button id="nav-trans" onclick="switchPage('TRANS')" class="nav-btn">Transactions</button>
-            <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">COMPLETED PRFS</button>
         </div>
         <div class="presence-box"><div id="online-list"></div></div>
         <button onclick="handleLogout()" class="nav-btn" style="color: var(--danger); border: 1.5px solid rgba(244, 63, 94, 0.4);">Sign Out</button>
@@ -123,6 +137,7 @@
             <div class="header-info"><h2 id="page-title">PRF TRACKER</h2></div>
             <div class="search-wrap"><input type="text" id="main-search" placeholder="Search records..." onkeyup="refreshTable()"></div>
             <div class="action-group">
+                <button id="btn-toggle-comp" onclick="toggleCompleted()" class="btn-main btn-outline btn-completed" style="display:flex;">Completed PRFs</button>
                 <button onclick="exportPDF()" class="btn-main btn-outline">Export PDF</button>
                 <button id="btn-create" onclick="openModal()" class="btn-main btn-primary">+ Create Entry</button>
             </div>
@@ -176,7 +191,6 @@
     </div>
 
     <script type="module">
-        // [Firebase logic from original code persists here...]
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove, update, onDisconnect, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -196,6 +210,8 @@
         const auth = getAuth(app);
         
         let logs = [], yardLogs = [], auditLogs = [], currentPage = 'DASH';
+        let showCompleted = false;
+
         const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
         const YARD_STATUS = ["Docked", "Undocked"];
 
@@ -220,7 +236,7 @@
             onValue(ref(db, 'prf_logs'), snap => {
                 const val = snap.val();
                 logs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
-                if(currentPage === 'DASH' || currentPage === 'COMP') refreshTable();
+                if(currentPage === 'DASH') refreshTable();
             });
             onValue(ref(db, 'yard_logs'), snap => {
                 const val = snap.val();
@@ -236,11 +252,30 @@
 
         window.switchPage = (page) => {
             currentPage = page;
+            showCompleted = false; 
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('nav-' + page.toLowerCase()).classList.add('active');
-            const titles = { 'YARD': 'BOAT YARD LOG', 'DASH': 'PRF TRACKER', 'COMP': 'COMPLETED PRFS', 'TRANS': 'TRANSACTIONS' };
+            
+            const titles = { 'YARD': 'BOAT YARD LOG', 'DASH': 'PRF TRACKER', 'TRANS': 'TRANSACTIONS' };
             document.getElementById('page-title').innerText = titles[page];
-            document.getElementById('btn-create').style.display = (page === 'TRANS' || page === 'COMP') ? 'none' : 'block';
+            
+            document.getElementById('btn-create').style.display = (page === 'TRANS') ? 'none' : 'block';
+            document.getElementById('btn-toggle-comp').style.display = (page === 'DASH') ? 'flex' : 'none';
+            document.getElementById('btn-toggle-comp').classList.remove('active-toggle');
+            
+            refreshTable();
+        };
+
+        window.toggleCompleted = () => {
+            showCompleted = !showCompleted;
+            const btn = document.getElementById('btn-toggle-comp');
+            if(showCompleted) {
+                btn.classList.add('active-toggle');
+                document.getElementById('page-title').innerText = 'COMPLETED PRFS';
+            } else {
+                btn.classList.remove('active-toggle');
+                document.getElementById('page-title').innerText = 'PRF TRACKER';
+            }
             refreshTable();
         };
 
@@ -283,10 +318,10 @@
                     <td style="font-weight:800;">${a.user}</td>
                 </tr>`).join('');
             } else {
-                head.innerHTML = `<tr><th style="width:100px;">Date</th><th style="width:120px;">PRF #</th><th>Asset Name</th><th style="width:100px;">Workshop</th><th style="width:160px;">Status</th><th style="width:140px;">Due Date</th><th>Remarks</th><th style="width:40px;"></th></tr>`;
+                head.innerHTML = `<tr><th style="width:100px;">Date</th><th style="width:120px;">PRF #</th><th>Asset Name</th><th style="width:100px;">Workshop</th><th style="width:160px;">Status</th><th style="width:140px;">Due Date</th><th style="min-width:300px;">Remarks</th><th style="width:40px;"></th></tr>`;
                 const filtered = logs.filter(l => {
                     const matches = (l.prf?.toUpperCase().includes(q) || l.asset?.toUpperCase().includes(q) || l.workshop?.toUpperCase().includes(q));
-                    return currentPage === 'DASH' ? (matches && l.status !== 'ALL RECEIVED') : (matches && l.status === 'ALL RECEIVED');
+                    return showCompleted ? (matches && l.status === 'ALL RECEIVED') : (matches && l.status !== 'ALL RECEIVED');
                 });
                 body.innerHTML = filtered.map(l => {
                     const sClass = `s-${l.status.replace(/[/ ]/g, '-')}`;
@@ -354,6 +389,7 @@
             const doc = new jsPDF('l', 'mm', 'a4');
             let data, head;
             const dateStr = new Date().toLocaleString('en-GB');
+            const reportName = showCompleted ? 'COMPLETED PRFS' : currentPage;
 
             if(currentPage === 'YARD') {
                 head = [['SLOT', 'VESSEL NAME', 'OWNER', 'DOCKED', 'EST. UNDOCK', 'STATUS', 'AGE', 'ACTUAL UNDOCK']];
@@ -366,16 +402,16 @@
                 data = auditLogs.map(a => [a.time, a.prf, a.action, a.details, a.user]);
             } else {
                 head = [['DATE', 'PRF #', 'ASSET NAME', 'WORKSHOP', 'STATUS', 'DUE DATE', 'REMARKS']];
-                const filterLogs = logs.filter(l => currentPage === 'DASH' ? l.status !== 'ALL RECEIVED' : l.status === 'ALL RECEIVED');
+                const filterLogs = logs.filter(l => showCompleted ? l.status === 'ALL RECEIVED' : l.status !== 'ALL RECEIVED');
                 data = filterLogs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta || 'N/A', l.remarks || '']);
             }
 
             doc.setFontSize(18);
-            doc.text(`SRD PORTAL: ${currentPage} REPORT`, 14, 15);
+            doc.text(`SRD PORTAL: ${reportName} REPORT`, 14, 15);
             doc.setFontSize(10);
             doc.text(`Report Exported On: ${dateStr}`, 14, 22);
             doc.autoTable({ startY: 28, head: head, body: data, theme: 'grid', headStyles: { fillStyle: [99, 102, 241] }, styles: { fontSize: 8 } });
-            doc.save(`SRD_${currentPage}_${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.save(`SRD_${reportName.replace(' ', '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         };
     </script>
 </body>
