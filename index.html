@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SRD PRF TRACKING | 2026 OFFICIAL</title>
+    <title>SRD PORTAL | 2026</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -86,10 +86,10 @@
     <nav class="sidebar">
         <div class="logo-box"><h1>SRD PRF<br>PORTAL 2026</h1></div>
         <div style="flex: 1;">
-            <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">Live Dashboard</button>
+            <button id="nav-dash" onclick="switchPage('DASH')" class="nav-btn active">PRF TRACKER</button>
             <button id="nav-yard" onclick="switchPage('YARD')" class="nav-btn">Boat Yard Log</button>
             <button id="nav-trans" onclick="switchPage('TRANS')" class="nav-btn">Transactions</button>
-            <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">COMPLETED</button>
+            <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">COMPLETED PRFS</button>
         </div>
         <div class="presence-box"><div id="online-list"></div></div>
         <button onclick="handleLogout()" class="nav-btn" style="color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2);">Sign Out</button>
@@ -97,7 +97,7 @@
 
     <div class="wrapper">
         <header class="top-bar">
-            <div class="header-info"><h2 id="page-title">LIVE DASHBOARD</h2></div>
+            <div class="header-info"><h2 id="page-title">PRF TRACKER</h2></div>
             <div class="search-wrap"><input type="text" id="main-search" placeholder="Search records..." onkeyup="refreshTable()"></div>
             <div class="action-group">
                 <button onclick="exportPDF()" class="btn-main btn-outline">Export PDF</button>
@@ -215,7 +215,7 @@
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('nav-' + page.toLowerCase()).classList.add('active');
             
-            const titles = { 'YARD': 'BOAT YARD LOG', 'DASH': 'LIVE DASHBOARD', 'COMP': 'COMPLETED', 'TRANS': 'TRANSACTIONS' };
+            const titles = { 'YARD': 'BOAT YARD LOG', 'DASH': 'PRF TRACKER', 'COMP': 'COMPLETED PRFS', 'TRANS': 'TRANSACTIONS' };
             document.getElementById('page-title').innerText = titles[page];
             
             document.getElementById('btn-create').style.display = (page === 'TRANS' || page === 'COMP') ? 'none' : 'block';
