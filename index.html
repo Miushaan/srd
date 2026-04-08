@@ -173,7 +173,7 @@
             </div>
             <div id="yard-form" style="display:none;">
                 <input type="text" id="y-slot" placeholder="SLOT NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
-                <input type="text" id="y-vessel" placeholder="VESSEL NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
+                <input type="text" id="y-vessel" placeholder="Asset Name" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
                 <input type="text" id="y-owner" placeholder="OWNER NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
                     <div>
@@ -285,7 +285,7 @@
             const body = document.getElementById('table-body');
 
             if (currentPage === 'YARD') {
-                head.innerHTML = `<tr><th style="width:80px;">Slot</th><th>Vessel Name</th><th>Owner</th><th style="width:110px;">Docked</th><th style="width:110px;">Est. Undock</th><th style="width:150px;">Status</th><th style="width:80px;">Age</th><th>Actual Undock</th><th style="width:40px;"></th></tr>`;
+                head.innerHTML = `<tr><th style="width:80px;">Slot</th><th>Asset Name</th><th>Owner</th><th style="width:110px;">Docked</th><th style="width:110px;">Est. Undock</th><th style="width:150px;">Status</th><th style="width:80px;">Age</th><th>Actual Undock</th><th style="width:40px;"></th></tr>`;
                 const filtered = yardLogs.filter(l => l.name?.toUpperCase().includes(q) || l.owner?.toUpperCase().includes(q) || l.slot?.toUpperCase().includes(q));
                 body.innerHTML = filtered.map(l => {
                     const start = new Date(l.docked);
@@ -392,7 +392,7 @@
             const reportName = showCompleted ? 'COMPLETED PRFS' : currentPage;
 
             if(currentPage === 'YARD') {
-                head = [['SLOT', 'VESSEL NAME', 'OWNER', 'DOCKED', 'EST. UNDOCK', 'STATUS', 'AGE', 'ACTUAL UNDOCK']];
+                head = [['SLOT', 'Asset Name', 'OWNER', 'DOCKED', 'EST. UNDOCK', 'STATUS', 'AGE', 'ACTUAL UNDOCK']];
                 data = yardLogs.map(l => {
                     const age = Math.floor(( (l.undocked?new Date(l.undocked):new Date()) - new Date(l.docked)) / (1000*60*60*24)) || 0;
                     return [l.slot, l.name, l.owner, l.docked, l.estUndock || 'N/A', l.status, age + " Days", l.undocked || 'N/A'];
