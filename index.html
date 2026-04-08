@@ -9,75 +9,98 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg: #f8fafc; --side: #0f172a; --brand: #6366f1; --brand-light: #e0e7ff; 
-            --success: #10b981; --border: #e2e8f0; --text-main: #1e293b; 
-            --text-muted: #64748b; --danger: #f43f5e; --warning: #f59e0b; 
+            --bg: #f8fafc; 
+            --side: #0f172a; 
+            --brand: #6366f1; 
+            --brand-light: #e0e7ff; 
+            --success: #10b981; 
+            --border: #cbd5e1; /* Darkened for more visibility */
+            --text-main: #1e293b; 
+            --text-muted: #64748b; 
+            --danger: #f43f5e; 
+            --warning: #f59e0b; 
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; outline: none; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; overflow: hidden; }
 
-        .sidebar { width: 260px; background: var(--side); color: white; display: flex; flex-direction: column; padding: 40px 20px; flex-shrink: 0; z-index: 100; }
-        .logo-box { margin-bottom: 50px; padding-left: 15px; border-left: 3px solid var(--brand); }
+        .sidebar { 
+            width: 260px; 
+            background: var(--side); 
+            color: white; 
+            display: flex; 
+            flex-direction: column; 
+            padding: 40px 20px; 
+            flex-shrink: 0; 
+            z-index: 100; 
+            border-right: 2px solid rgba(255,255,255,0.1); /* Visible sidebar edge */
+        }
+        .logo-box { margin-bottom: 50px; padding-left: 15px; border-left: 4px solid var(--brand); }
         .logo-box h1 { font-size: 14px; font-weight: 800; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
         
-        .nav-btn { width: 100%; padding: 14px 18px; border-radius: 12px; border: none; background: transparent; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; }
-        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; }
-        .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 10px 15px -3px rgba(99, 102, 241, 0.3); }
+        .nav-btn { width: 100%; padding: 14px 18px; border-radius: 12px; border: 1px solid transparent; background: transparent; color: #94a3b8; font-weight: 600; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: 0.2s; margin-bottom: 8px; text-transform: uppercase; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1); }
+        .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); border-color: rgba(255,255,255,0.2); }
 
-        .presence-box { margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; }
+        .presence-box { margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
         .u-row { font-size: 10px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
         .u-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
 
         .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
-        .top-bar { padding: 20px 40px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 20px; }
+        .top-bar { padding: 20px 40px; background: white; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 20px; }
         
         .header-info { flex-shrink: 0; }
         .header-info h2 { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; }
 
         .search-wrap { flex: 1; max-width: 400px; }
-        .search-wrap input { width: 100%; padding: 12px 20px; border-radius: 14px; border: 1px solid var(--border); background: #f1f5f9; font-size: 13px; font-family: inherit; }
+        .search-wrap input { width: 100%; padding: 12px 20px; border-radius: 14px; border: 2px solid var(--border); background: #ffffff; font-size: 13px; font-family: inherit; transition: 0.2s; }
+        .search-wrap input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-light); }
 
         .action-group { display: flex; gap: 10px; margin-left: auto; }
 
         .main-content { flex: 1; padding: 30px 40px; overflow: auto; }
-        .table-container { background: white; border-radius: 20px; box-shadow: 0 4px 25px -5px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; }
+        .table-container { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid var(--border); overflow: hidden; }
 
         table { width: 100%; border-collapse: collapse; }
-        thead th { position: sticky; top: 0; background: #f8fafc; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border); }
-        tbody td { padding: 12px 20px; border-bottom: 1px solid #f1f5f9; font-size: 13px; vertical-align: middle; }
+        thead th { position: sticky; top: 0; background: #f1f5f9; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-main); text-transform: uppercase; border-bottom: 2px solid var(--border); border-right: 1px solid var(--border); }
+        tbody td { padding: 12px 20px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody td:last-child, thead th:last-child { border-right: none; }
 
-        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 140px; border: none; cursor: pointer; text-align: center; }
+        .status-select { padding: 8px; border-radius: 10px; font-size: 10px; font-weight: 800; width: 140px; border: 1px solid rgba(0,0,0,0.1); cursor: pointer; text-align: center; }
         
-        .s-PENDING, .s-Undocked { background: #f1f5f9; color: #475569; }
-        .s-ITEM-CREATION { background: #e0e7ff; color: #4338ca; }
-        .s-PR-MTR-RAISED { background: #fef9c3; color: #854d0e; }
-        .s-PO-RAISED, .s-Docked { background: #dcfce7; color: #166534; }
-        .s-PAYMENT-PENDING { background: #ffedd5; color: #9a3412; }
-        .s-PART-RECEIVED { background: #f0fdf4; color: #15803d; border: 1px dashed #10b981; }
-        .s-ALL-RECEIVED { background: var(--success); color: white; }
-        .s-OH-HOLD { background: #fee2e2; color: #991b1b; }
+        .s-PENDING, .s-Undocked { background: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+        .s-ITEM-CREATION { background: #e0e7ff; color: #4338ca; border-color: #c7d2fe; }
+        .s-PR-MTR-RAISED { background: #fef9c3; color: #854d0e; border-color: #fde68a; }
+        .s-PO-RAISED, .s-Docked { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .s-PAYMENT-PENDING { background: #ffedd5; color: #9a3412; border-color: #fed7aa; }
+        .s-PART-RECEIVED { background: #f0fdf4; color: #15803d; border: 1.5px dashed #10b981; }
+        .s-ALL-RECEIVED { background: var(--success); color: white; border-color: #059669; }
+        .s-OH-HOLD { background: #fee2e2; color: #991b1b; border-color: #fecaca; }
         .s-CANCELLED { background: #1e293b; color: white; }
 
-        .remarks-editor { width: 100%; padding: 8px; background: #f8fafc; border-radius: 8px; font-size: 12px; border: 1px solid transparent; font-family: inherit; }
-        .remarks-editor:focus { background: white; border-color: var(--brand); }
+        .remarks-editor { width: 100%; padding: 8px; background: #f8fafc; border-radius: 8px; font-size: 12px; border: 1px solid var(--border); font-family: inherit; transition: 0.2s; }
+        .remarks-editor:focus { background: white; border-color: var(--brand); border-width: 1px; box-shadow: 0 0 0 2px var(--brand-light); }
         
-        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
-        .modal { background: white; padding: 40px; border-radius: 24px; width: 500px; }
-        .btn-main { padding: 12px 20px; border-radius: 12px; font-weight: 800; border: none; cursor: pointer; text-transform: uppercase; font-size: 10px; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 2000; }
+        .modal { background: white; padding: 40px; border-radius: 24px; width: 500px; border: 2px solid var(--brand); }
+        
+        .btn-main { padding: 12px 20px; border-radius: 12px; font-weight: 800; border: 2px solid transparent; cursor: pointer; text-transform: uppercase; font-size: 10px; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .btn-primary { background: var(--brand); color: white; }
-        .btn-outline { background: white; border: 1px solid var(--border); color: var(--text-main); }
+        .btn-primary:hover { background: #4f46e5; transform: translateY(-1px); }
+        .btn-outline { background: white; border-color: var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: #f1f5f9; border-color: var(--text-muted); }
         
-        .age-badge { font-weight: 800; font-size: 12px; color: var(--brand); background: var(--brand-light); padding: 4px 10px; border-radius: 6px; }
+        .age-badge { font-weight: 800; font-size: 11px; color: var(--brand); background: var(--brand-light); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--brand); }
     </style>
 </head>
 <body>
 
     <div id="auth-overlay" style="position: fixed; inset: 0; background: #0f172a; display: flex; align-items: center; justify-content: center; z-index: 5000;">
-        <div style="background: white; padding: 50px; border-radius: 30px; width: 400px; text-align: center;">
+        <div style="background: white; padding: 50px; border-radius: 30px; width: 400px; text-align: center; border: 3px solid var(--brand);">
             <h2 style="font-weight: 800; margin-bottom: 25px;">SYSTEM ACCESS</h2>
-            <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:1px solid var(--border);">
-            <input type="password" id="login-pass" placeholder="Password" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border);">
+            <input type="email" id="login-email" placeholder="Email" style="width:100%; padding:14px; margin-bottom:12px; border-radius:12px; border:2px solid var(--border);">
+            <input type="password" id="login-pass" placeholder="Password" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:2px solid var(--border);">
             <button onclick="handleLogin()" class="btn-main btn-primary" style="width:100%; justify-content: center;">Authenticate</button>
             <p id="auth-error" style="color:var(--danger); font-size:11px; margin-top:15px; font-weight:800;"></p>
         </div>
@@ -92,7 +115,7 @@
             <button id="nav-comp" onclick="switchPage('COMP')" class="nav-btn">COMPLETED PRFS</button>
         </div>
         <div class="presence-box"><div id="online-list"></div></div>
-        <button onclick="handleLogout()" class="nav-btn" style="color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2);">Sign Out</button>
+        <button onclick="handleLogout()" class="nav-btn" style="color: var(--danger); border: 1.5px solid rgba(244, 63, 94, 0.4);">Sign Out</button>
     </nav>
 
     <div class="wrapper">
@@ -119,9 +142,9 @@
         <div class="modal">
             <h2 id="modal-title" style="margin-bottom:25px; font-weight: 800;">NEW ENTRY</h2>
             <div id="prf-form">
-                <input type="text" id="m-prf" placeholder="PRF NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
-                <input type="text" id="m-asset" placeholder="ASSET NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
-                <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="m-prf" placeholder="PRF NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
+                <input type="text" id="m-asset" placeholder="ASSET NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
+                <select id="m-workshop" style="width:100%; padding:14px; margin-bottom:20px; border-radius:12px; border:2px solid var(--border); font-family: inherit; font-weight: 700;">
                     <option value="">-- SELECT WORKSHOP --</option>
                     <option value="DAU/LOS">DAU/LOS</option><option value="EEW">EEW</option><option value="MRW">MRW</option>
                     <option value="MSH">MSH</option><option value="MWU">MWU</option><option value="NMU">NMU</option>
@@ -134,17 +157,17 @@
                 </div>
             </div>
             <div id="yard-form" style="display:none;">
-                <input type="text" id="y-slot" placeholder="SLOT NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
-                <input type="text" id="y-vessel" placeholder="VESSEL NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
-                <input type="text" id="y-owner" placeholder="OWNER NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                <input type="text" id="y-slot" placeholder="SLOT NUMBER" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
+                <input type="text" id="y-vessel" placeholder="VESSEL NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
+                <input type="text" id="y-owner" placeholder="OWNER NAME" class="remarks-editor" style="margin-bottom:12px; padding:14px; border-radius:12px; border:2px solid var(--border);">
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px;">
                     <div>
                         <label style="font-size: 10px; font-weight: 800; color: var(--text-muted);">DOCKING DATE</label>
-                        <input type="date" id="y-docked" style="width:100%; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                        <input type="date" id="y-docked" style="width:100%; padding:14px; border-radius:12px; border:2px solid var(--border);">
                     </div>
                     <div>
                         <label style="font-size: 10px; font-weight: 800; color: var(--text-muted);">EST. UNDOCK DATE</label>
-                        <input type="date" id="y-est-undock" style="width:100%; padding:14px; border-radius:12px; border:1px solid var(--border);">
+                        <input type="date" id="y-est-undock" style="width:100%; padding:14px; border-radius:12px; border:2px solid var(--border);">
                     </div>
                 </div>
                 <button onclick="saveYardEntry()" class="btn-main btn-primary" style="width:100%; justify-content:center;">Register Vessel</button>
@@ -153,6 +176,7 @@
     </div>
 
     <script type="module">
+        // [Firebase logic from original code persists here...]
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
         import { getDatabase, ref, push, onValue, remove, update, onDisconnect, set } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-database.js";
         import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
@@ -214,12 +238,9 @@
             currentPage = page;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('nav-' + page.toLowerCase()).classList.add('active');
-            
             const titles = { 'YARD': 'BOAT YARD LOG', 'DASH': 'PRF TRACKER', 'COMP': 'COMPLETED PRFS', 'TRANS': 'TRANSACTIONS' };
             document.getElementById('page-title').innerText = titles[page];
-            
             document.getElementById('btn-create').style.display = (page === 'TRANS' || page === 'COMP') ? 'none' : 'block';
-            
             refreshTable();
         };
 
