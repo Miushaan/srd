@@ -42,7 +42,7 @@
         .nav-btn:hover { background: rgba(255,255,255,0.05); color: white; border-color: rgba(255,255,255,0.1); }
         .nav-btn.active { background: var(--brand); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4); border-color: rgba(255,255,255,0.2); }
 
-        .presence-box { margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); }
+        .presence-box { margin-bottom: 20px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(4px); }
         .u-row { font-size: 10px; color: #cbd5e1; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; font-weight: 700; }
         .u-dot { width: 6px; height: 6px; background: var(--success); border-radius: 50%; box-shadow: 0 0 8px var(--success); }
 
@@ -209,7 +209,7 @@
         const db = getDatabase(app);
         const auth = getAuth(app);
         
-        let logs = [], yardLogs = [], auditLogs = [], currentPage = 'DASH';
+        let logs = [], yardLogs = [], transactionLogs = [], currentPage = 'DASH';
         let showCompleted = false;
 
         const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
@@ -243,9 +243,9 @@
                 yardLogs = val ? Object.keys(val).map(k => ({ id: k, ...val[k] })) : [];
                 if(currentPage === 'YARD') refreshTable();
             });
-            onValue(ref(db, 'audit_trail'), snap => {
+            onValue(ref(db, 'transactions'), snap => {
                 const val = snap.val();
-                auditLogs = val ? Object.values(val).reverse() : [];
+                transactionLogs = val ? Object.values(val).reverse() : [];
                 if(currentPage === 'TRANS') refreshTable();
             });
         }
@@ -271,7 +271,7 @@
             const btn = document.getElementById('btn-toggle-comp');
             if(showCompleted) {
                 btn.classList.add('active-toggle');
-                document.getElementById('page-title').innerText = 'COMPLETED PRFS';
+                document.getElementById('page-title').innerText = 'COMPLETED PRFs';
             } else {
                 btn.classList.remove('active-toggle');
                 document.getElementById('page-title').innerText = 'PRF TRACKER';
@@ -309,7 +309,7 @@
                 }).join('');
             } else if (currentPage === 'TRANS') {
                 head.innerHTML = `<tr><th style="width:180px;">Timestamp</th><th style="width:120px;">Reference</th><th>Action Type</th><th>Details</th><th>User</th></tr>`;
-                const filtered = auditLogs.filter(a => a.prf?.toUpperCase().includes(q) || a.action?.toUpperCase().includes(q) || a.user?.toUpperCase().includes(q));
+                const filtered = transactionLogs.filter(a => a.prf?.toUpperCase().includes(q) || a.action?.toUpperCase().includes(q) || a.user?.toUpperCase().includes(q));
                 body.innerHTML = filtered.map(a => `<tr>
                     <td style="color:var(--text-muted); font-size:11px;">${a.time}</td>
                     <td style="font-weight:800; color:var(--brand);">${a.prf}</td>
@@ -362,14 +362,14 @@
 
         window.updateField = (id, field, val, prf) => {
             update(ref(db, `prf_logs/${id}`), { [field]: val });
-            push(ref(db, 'audit_trail'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `PRF Edit: ${field}`, prf: prf, details: val });
+            push(ref(db, 'transactions'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `PRF Edit: ${field}`, prf: prf, details: val });
         };
 
         window.updateYard = (id, field, val) => {
             const upd = { [field]: val };
             if (field === 'undocked' && val !== "") upd.status = "Undocked";
             update(ref(db, `yard_logs/${id}`), upd);
-            push(ref(db, 'audit_trail'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `Yard Edit: ${field}`, prf: 'YARD', details: val });
+            push(ref(db, 'transactions'), { time: new Date().toLocaleString(), user: auth.currentUser.email.split('@')[0].toUpperCase(), action: `Yard Edit: ${field}`, prf: 'YARD', details: val });
         };
 
         window.openModal = () => {
@@ -389,7 +389,7 @@
             const doc = new jsPDF('l', 'mm', 'a4');
             let data, head;
             const dateStr = new Date().toLocaleString('en-GB');
-            const reportName = showCompleted ? 'COMPLETED PRFS' : currentPage;
+            const reportName = (currentPage === 'TRANS') ? 'TRANSACTIONS' : (showCompleted ? 'COMPLETED PRFS' : currentPage);
 
             if(currentPage === 'YARD') {
                 head = [['SLOT', 'Asset Name', 'OWNER', 'DOCKED', 'EST. UNDOCK', 'STATUS', 'AGE', 'ACTUAL UNDOCK']];
@@ -399,7 +399,7 @@
                 });
             } else if (currentPage === 'TRANS') {
                 head = [['TIMESTAMP', 'REF', 'ACTION', 'DETAILS', 'USER']];
-                data = auditLogs.map(a => [a.time, a.prf, a.action, a.details, a.user]);
+                data = transactionLogs.map(a => [a.time, a.prf, a.action, a.details, a.user]);
             } else {
                 head = [['DATE', 'PRF #', 'ASSET NAME', 'WORKSHOP', 'STATUS', 'DUE DATE', 'REMARKS']];
                 const filterLogs = logs.filter(l => showCompleted ? l.status === 'ALL RECEIVED' : l.status !== 'ALL RECEIVED');
