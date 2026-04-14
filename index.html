@@ -34,7 +34,12 @@
             flex-shrink: 0; 
             z-index: 100; 
             border-right: 2px solid rgba(255,255,255,0.1); 
+            transition: margin-left 0.3s ease;
         }
+        .sidebar.hidden {
+            margin-left: -260px;
+        }
+        
         .logo-box { margin-bottom: 50px; padding-left: 15px; border-left: 4px solid var(--brand); }
         .logo-box h1 { font-size: 14px; font-weight: 800; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
         
@@ -49,6 +54,21 @@
         .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
         .top-bar { padding: 20px 40px; background: white; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 20px; }
         
+        .hamburger {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            border-radius: 8px;
+            transition: 0.2s;
+            margin-right: 5px;
+        }
+        .hamburger:hover { background: var(--bg); }
+
         .header-info { flex-shrink: 0; }
         .header-info h2 { font-weight: 800; font-size: 18px; letter-spacing: -0.5px; }
 
@@ -62,7 +82,7 @@
         .table-container { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 2px solid var(--border); overflow: hidden; }
 
         table { width: 100%; border-collapse: collapse; }
-        thead th { position: sticky; top: 0; background: #f1f5f9; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-main); text-transform: uppercase; border-bottom: 2px solid var(--border); border-right: 1px solid var(--border); }
+        thead th { position: sticky; top: 0; background: #f1f5f9; padding: 18px 20px; text-align: left; font-size: 10px; font-weight: 800; color: var(--text-main); text-transform: uppercase; border-bottom: 2px solid var(--border); border-right: 1px solid var(--border); z-index: 10; }
         tbody td { padding: 12px 20px; border-bottom: 1px solid var(--border); border-right: 1px solid var(--border); font-size: 13px; vertical-align: middle; }
         tbody tr:last-child td { border-bottom: none; }
         tbody td:last-child, thead th:last-child { border-right: none; }
@@ -134,10 +154,14 @@
 
     <div class="wrapper">
         <header class="top-bar">
+            <button class="hamburger" onclick="toggleSidebar()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+            </button>
             <div class="header-info"><h2 id="page-title">PRF TRACKER</h2></div>
             <div class="search-wrap"><input type="text" id="main-search" placeholder="Search records..." onkeyup="refreshTable()"></div>
             <div class="action-group">
                 <button id="btn-toggle-comp" onclick="toggleCompleted()" class="btn-main btn-outline btn-completed" style="display:flex;">Completed PRFs</button>
+                <button id="btn-toggle-undocked" onclick="toggleUndocked()" class="btn-main btn-outline btn-completed" style="display:none;">Undocked Assets</button>
                 <button onclick="exportPDF()" class="btn-main btn-outline">Export PDF</button>
                 <button id="btn-create" onclick="openModal()" class="btn-main btn-primary">+ Create Entry</button>
             </div>
@@ -211,6 +235,7 @@
         
         let logs = [], yardLogs = [], transactionLogs = [], currentPage = 'DASH';
         let showCompleted = false;
+        let showUndocked = false; // Added state
 
         const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
         const YARD_STATUS = ["Docked", "Undocked"];
@@ -250,9 +275,14 @@
             });
         }
 
+        window.toggleSidebar = () => {
+            document.querySelector('.sidebar').classList.toggle('hidden');
+        };
+
         window.switchPage = (page) => {
             currentPage = page;
             showCompleted = false; 
+            showUndocked = false;
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             document.getElementById('nav-' + page.toLowerCase()).classList.add('active');
             
@@ -262,6 +292,9 @@
             document.getElementById('btn-create').style.display = (page === 'TRANS') ? 'none' : 'block';
             document.getElementById('btn-toggle-comp').style.display = (page === 'DASH') ? 'flex' : 'none';
             document.getElementById('btn-toggle-comp').classList.remove('active-toggle');
+            
+            document.getElementById('btn-toggle-undocked').style.display = (page === 'YARD') ? 'flex' : 'none';
+            document.getElementById('btn-toggle-undocked').classList.remove('active-toggle');
             
             refreshTable();
         };
@@ -279,6 +312,19 @@
             refreshTable();
         };
 
+        window.toggleUndocked = () => {
+            showUndocked = !showUndocked;
+            const btn = document.getElementById('btn-toggle-undocked');
+            if(showUndocked) {
+                btn.classList.add('active-toggle');
+                document.getElementById('page-title').innerText = 'UNDOCKED ASSETS';
+            } else {
+                btn.classList.remove('active-toggle');
+                document.getElementById('page-title').innerText = 'BOAT YARD LOG';
+            }
+            refreshTable();
+        };
+
         window.refreshTable = () => {
             const q = document.getElementById('main-search').value.toUpperCase();
             const head = document.getElementById('table-head');
@@ -286,7 +332,10 @@
 
             if (currentPage === 'YARD') {
                 head.innerHTML = `<tr><th style="width:80px;">Slot</th><th>Asset Name</th><th>Owner</th><th style="width:110px;">Docked</th><th style="width:110px;">Est. Undock</th><th style="width:150px;">Status</th><th style="width:80px;">Age</th><th>Actual Undock</th><th style="width:40px;"></th></tr>`;
-                const filtered = yardLogs.filter(l => l.name?.toUpperCase().includes(q) || l.owner?.toUpperCase().includes(q) || l.slot?.toUpperCase().includes(q));
+                const filtered = yardLogs.filter(l => {
+                    const matches = l.name?.toUpperCase().includes(q) || l.owner?.toUpperCase().includes(q) || l.slot?.toUpperCase().includes(q);
+                    return showUndocked ? (matches && l.status === 'Undocked') : (matches && l.status !== 'Undocked');
+                });
                 body.innerHTML = filtered.map(l => {
                     const start = new Date(l.docked);
                     const end = l.undocked ? new Date(l.undocked) : new Date();
@@ -389,11 +438,14 @@
             const doc = new jsPDF('l', 'mm', 'a4');
             let data, head;
             const dateStr = new Date().toLocaleString('en-GB');
-            const reportName = (currentPage === 'TRANS') ? 'TRANSACTIONS' : (showCompleted ? 'COMPLETED PRFS' : currentPage);
+            const reportName = (currentPage === 'TRANS') ? 'TRANSACTIONS' : 
+                               (currentPage === 'YARD' ? (showUndocked ? 'UNDOCKED ASSETS' : 'BOAT YARD LOG') :
+                               (showCompleted ? 'COMPLETED PRFS' : currentPage));
 
             if(currentPage === 'YARD') {
                 head = [['SLOT', 'Asset Name', 'OWNER', 'DOCKED', 'EST. UNDOCK', 'STATUS', 'AGE', 'ACTUAL UNDOCK']];
-                data = yardLogs.map(l => {
+                const filteredYard = yardLogs.filter(l => showUndocked ? l.status === 'Undocked' : l.status !== 'Undocked');
+                data = filteredYard.map(l => {
                     const age = Math.floor(( (l.undocked?new Date(l.undocked):new Date()) - new Date(l.docked)) / (1000*60*60*24)) || 0;
                     return [l.slot, l.name, l.owner, l.docked, l.estUndock || 'N/A', l.status, age + " Days", l.undocked || 'N/A'];
                 });
@@ -411,7 +463,7 @@
             doc.setFontSize(10);
             doc.text(`Report Exported On: ${dateStr}`, 14, 22);
             doc.autoTable({ startY: 28, head: head, body: data, theme: 'grid', headStyles: { fillStyle: [99, 102, 241] }, styles: { fontSize: 8 } });
-            doc.save(`SRD_${reportName.replace(' ', '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
+            doc.save(`SRD_${reportName.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         };
     </script>
 </body>
