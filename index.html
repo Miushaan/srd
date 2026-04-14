@@ -36,9 +36,7 @@
             border-right: 2px solid rgba(255,255,255,0.1); 
             transition: margin-left 0.3s ease;
         }
-        .sidebar.hidden {
-            margin-left: -260px;
-        }
+        .sidebar.hidden { margin-left: -260px; }
         
         .logo-box { margin-bottom: 50px; padding-left: 15px; border-left: 4px solid var(--brand); }
         .logo-box h1 { font-size: 14px; font-weight: 800; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; }
@@ -54,19 +52,7 @@
         .wrapper { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
         .top-bar { padding: 20px 40px; background: white; border-bottom: 2px solid var(--border); display: flex; align-items: center; gap: 20px; }
         
-        .hamburger {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: var(--text-main);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            border-radius: 8px;
-            transition: 0.2s;
-            margin-right: 5px;
-        }
+        .hamburger { background: none; border: none; cursor: pointer; color: var(--text-main); display: flex; align-items: center; justify-content: center; padding: 5px; border-radius: 8px; transition: 0.2s; margin-right: 5px; }
         .hamburger:hover { background: var(--bg); }
 
         .header-info { flex-shrink: 0; }
@@ -235,13 +221,15 @@
         
         let logs = [], yardLogs = [], transactionLogs = [], currentPage = 'DASH';
         let showCompleted = false;
-        let showUndocked = false; // Added state
+        let showUndocked = false;
 
         const STATUS_OPTIONS = ["PENDING", "ITEM CREATION", "PR/MTR-RAISED", "PO-RAISED", "PAYMENT PENDING", "PART RECEIVED", "ALL RECEIVED", "OH-HOLD", "CANCELLED"];
         const YARD_STATUS = ["Docked", "Undocked"];
 
+        // GLOBAL BINDINGS
         window.handleLogin = () => signInWithEmailAndPassword(auth, document.getElementById('login-email').value, document.getElementById('login-pass').value).catch(() => alert("Access Denied"));
         window.handleLogout = () => signOut(auth);
+        
         onAuthStateChanged(auth, user => {
             document.getElementById('auth-overlay').style.display = user ? 'none' : 'flex';
             if(user) { initData(); setupPresence(user); }
@@ -275,9 +263,7 @@
             });
         }
 
-        window.toggleSidebar = () => {
-            document.querySelector('.sidebar').classList.toggle('hidden');
-        };
+        window.toggleSidebar = () => document.querySelector('.sidebar').classList.toggle('hidden');
 
         window.switchPage = (page) => {
             currentPage = page;
@@ -292,7 +278,6 @@
             document.getElementById('btn-create').style.display = (page === 'TRANS') ? 'none' : 'block';
             document.getElementById('btn-toggle-comp').style.display = (page === 'DASH') ? 'flex' : 'none';
             document.getElementById('btn-toggle-comp').classList.remove('active-toggle');
-            
             document.getElementById('btn-toggle-undocked').style.display = (page === 'YARD') ? 'flex' : 'none';
             document.getElementById('btn-toggle-undocked').classList.remove('active-toggle');
             
@@ -302,26 +287,16 @@
         window.toggleCompleted = () => {
             showCompleted = !showCompleted;
             const btn = document.getElementById('btn-toggle-comp');
-            if(showCompleted) {
-                btn.classList.add('active-toggle');
-                document.getElementById('page-title').innerText = 'COMPLETED PRFs';
-            } else {
-                btn.classList.remove('active-toggle');
-                document.getElementById('page-title').innerText = 'PRF TRACKER';
-            }
+            btn.classList.toggle('active-toggle', showCompleted);
+            document.getElementById('page-title').innerText = showCompleted ? 'COMPLETED PRFs' : 'PRF TRACKER';
             refreshTable();
         };
 
         window.toggleUndocked = () => {
             showUndocked = !showUndocked;
             const btn = document.getElementById('btn-toggle-undocked');
-            if(showUndocked) {
-                btn.classList.add('active-toggle');
-                document.getElementById('page-title').innerText = 'UNDOCKED ASSETS';
-            } else {
-                btn.classList.remove('active-toggle');
-                document.getElementById('page-title').innerText = 'BOAT YARD LOG';
-            }
+            btn.classList.toggle('active-toggle', showUndocked);
+            document.getElementById('page-title').innerText = showUndocked ? 'UNDOCKED ASSETS' : 'BOAT YARD LOG';
             refreshTable();
         };
 
@@ -385,7 +360,7 @@
                             </select>
                         </td>
                         <td><input type="date" value="${l.eta || ''}" class="remarks-editor" onchange="updateField('${l.id}', 'eta', this.value, '${l.prf}')"></td>
-                        <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
+                        <td><div class="remarks-editor" contenteditable="true" onblur="updateField('${l.id}', 'remarks', this.innerText.trim().toUpperCase(), '${l.prf}')">${l.remarks || ''}</div></td>
                         <td><button onclick="deleteRow('${l.id}')" style="background:none; border:none; cursor:pointer; color:#cbd5e1; font-size:18px;">&times;</button></td>
                     </tr>`;
                 }).join('');
@@ -430,12 +405,39 @@
         };
 
         window.closeModal = () => document.getElementById('entry-modal').style.display = 'none';
-        window.deleteRow = (id) => { if(confirm('Delete permanently?')) remove(ref(db, `prf_logs/${id}`)); };
-        window.deleteYard = (id) => { if(confirm('Delete vessel?')) remove(ref(db, `yard_logs/${id}`)); };
+
+        window.deleteRow = (id) => { 
+            if(confirm('Delete permanently?')) {
+                const item = logs.find(l => l.id === id);
+                push(ref(db, 'transactions'), { 
+                    time: new Date().toLocaleString(), 
+                    user: auth.currentUser.email.split('@')[0].toUpperCase(), 
+                    action: 'DELETED PRF', 
+                    prf: item?.prf || 'N/A', 
+                    details: `Asset: ${item?.asset}` 
+                });
+                remove(ref(db, `prf_logs/${id}`)); 
+            }
+        };
+
+        window.deleteYard = (id) => { 
+            if(confirm('Delete vessel?')) {
+                const item = yardLogs.find(l => l.id === id);
+                push(ref(db, 'transactions'), { 
+                    time: new Date().toLocaleString(), 
+                    user: auth.currentUser.email.split('@')[0].toUpperCase(), 
+                    action: 'DELETED YARD ENTRY', 
+                    prf: 'YARD', 
+                    details: `Vessel: ${item?.name}` 
+                });
+                remove(ref(db, `yard_logs/${id}`)); 
+            }
+        };
 
         window.exportPDF = () => {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a4');
+            const q = document.getElementById('main-search').value.toUpperCase();
             let data, head;
             const dateStr = new Date().toLocaleString('en-GB');
             const reportName = (currentPage === 'TRANS') ? 'TRANSACTIONS' : 
@@ -444,17 +446,23 @@
 
             if(currentPage === 'YARD') {
                 head = [['SLOT', 'Asset Name', 'OWNER', 'DOCKED', 'EST. UNDOCK', 'STATUS', 'AGE', 'ACTUAL UNDOCK']];
-                const filteredYard = yardLogs.filter(l => showUndocked ? l.status === 'Undocked' : l.status !== 'Undocked');
+                const filteredYard = yardLogs.filter(l => {
+                    const matches = l.name?.toUpperCase().includes(q) || l.owner?.toUpperCase().includes(q);
+                    return showUndocked ? (matches && l.status === 'Undocked') : (matches && l.status !== 'Undocked');
+                });
                 data = filteredYard.map(l => {
                     const age = Math.floor(( (l.undocked?new Date(l.undocked):new Date()) - new Date(l.docked)) / (1000*60*60*24)) || 0;
                     return [l.slot, l.name, l.owner, l.docked, l.estUndock || 'N/A', l.status, age + " Days", l.undocked || 'N/A'];
                 });
             } else if (currentPage === 'TRANS') {
                 head = [['TIMESTAMP', 'REF', 'ACTION', 'DETAILS', 'USER']];
-                data = transactionLogs.map(a => [a.time, a.prf, a.action, a.details, a.user]);
+                data = transactionLogs.filter(a => a.prf?.toUpperCase().includes(q) || a.action?.toUpperCase().includes(q)).map(a => [a.time, a.prf, a.action, a.details, a.user]);
             } else {
                 head = [['DATE', 'PRF #', 'ASSET NAME', 'WORKSHOP', 'STATUS', 'DUE DATE', 'REMARKS']];
-                const filterLogs = logs.filter(l => showCompleted ? l.status === 'ALL RECEIVED' : l.status !== 'ALL RECEIVED');
+                const filterLogs = logs.filter(l => {
+                    const matches = l.prf?.toUpperCase().includes(q) || l.asset?.toUpperCase().includes(q);
+                    return showCompleted ? (matches && l.status === 'ALL RECEIVED') : (matches && l.status !== 'ALL RECEIVED');
+                });
                 data = filterLogs.map(l => [l.date, l.prf, l.asset, l.workshop, l.status, l.eta || 'N/A', l.remarks || '']);
             }
 
@@ -462,7 +470,7 @@
             doc.text(`SRD PORTAL: ${reportName} REPORT`, 14, 15);
             doc.setFontSize(10);
             doc.text(`Report Exported On: ${dateStr}`, 14, 22);
-            doc.autoTable({ startY: 28, head: head, body: data, theme: 'grid', headStyles: { fillStyle: [99, 102, 241] }, styles: { fontSize: 8 } });
+            doc.autoTable({ startY: 28, head: head, body: data, theme: 'grid', headStyles: { fillColor: [99, 102, 241] }, styles: { fontSize: 8 } });
             doc.save(`SRD_${reportName.replace(/ /g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`);
         };
     </script>
