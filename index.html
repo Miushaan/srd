@@ -19,19 +19,22 @@
                     <i class="fa-solid fa-ship text-2xl"></i>
                 </div>
                 <h2 class="text-xl font-bold tracking-tight text-slate-900">Dockyard Management System</h2>
-                <p class="text-xs text-slate-500">Sign in with your credentials to access live schedule</p>
+                <p class="text-xs text-slate-500">Sign in with your authorized credentials to access live schedule</p>
             </div>
             <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
                 <div>
                     <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Email Address</label>
-                    <input type="email" id="loginEmail" required value="admin@dockyard.com" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                    <input type="email" id="loginEmail" required placeholder="Enter authorized email" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Password</label>
-                    <input type="password" id="loginPassword" required value="password123" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                    <input type="password" id="loginPassword" required placeholder="Enter password" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
                 </div>
                 <div id="loginError" class="text-rose-600 text-xs text-center hidden font-medium"></div>
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-xs font-semibold transition shadow-md">Sign In to Dashboard</button>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-xs font-semibold transition shadow-md flex items-center justify-center gap-2">
+                    <span id="loginBtnText">Sign In to Dashboard</span>
+                    <i id="loginSpinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
+                </button>
             </form>
             <div class="text-center border-t border-slate-100 pt-4 text-[11px] text-slate-400">
                 Connected securely to Firebase Realtime Database
@@ -66,6 +69,7 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <div id="userInfoDisplay" class="text-xs font-medium text-slate-600 hidden sm:block"></div>
                 <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-2 shadow-sm">
                     <i class="fa-solid fa-plus"></i> New Booking
                 </button>
@@ -155,7 +159,8 @@
                                 <th class="p-3">Customer</th>
                                 <th class="p-3">Type</th>
                                 <th class="p-3">Docking Date</th>
-                                <th class="p-3">Est. End Date</th>
+                                <th class="p-3">Quoted End Date</th>
+                                <th class="p-3">Est. End Date (Delay)</th>
                                 <th class="p-3">Quoted Days</th>
                                 <th class="p-3">Status</th>
                                 <th class="p-3">Remarks</th>
@@ -186,7 +191,8 @@
                                 <th class="p-3">Customer</th>
                                 <th class="p-3">Type</th>
                                 <th class="p-3">Docking Date</th>
-                                <th class="p-3">Est. End Date</th>
+                                <th class="p-3">Quoted End Date</th>
+                                <th class="p-3">Est. End Date (Delay)</th>
                                 <th class="p-3">Quoted Days</th>
                                 <th class="p-3">Status</th>
                                 <th class="p-3">Remarks</th>
@@ -220,9 +226,9 @@
                             Next Month <i class="fa-solid fa-chevron-right ml-1"></i>
                         </button>
                         <div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
-                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Quoted</span>
-                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Est. End</span>
-                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Overstay</span>
+                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Quoted Span</span>
+                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Est. Completion</span>
+                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Overstay/Delay</span>
                     </div>
                 </div>
 
@@ -282,11 +288,16 @@
                         <input type="number" id="quotedDays" oninput="calculateFormEndDate()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none" value="5">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Estimated End Date</label>
-                        <input type="date" id="estEndDateInput" onchange="calculateFormDaysFromEnd()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-blue-600 font-mono font-semibold focus:border-blue-500 focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quoted End Date (Auto)</label>
+                        <input type="date" id="quotedEndDateInput" readonly class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-xs text-emerald-700 font-mono font-semibold focus:outline-none">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Estimated End Date (If delayed / extended)</label>
+                        <input type="date" id="estEndDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-blue-600 font-mono font-semibold focus:border-blue-500 focus:outline-none" placeholder="Leave blank if completed on quoted date">
+                        <p class="text-[10px] text-slate-400 mt-0.5">Select only if vessel exceeds quoted duration.</p>
+                    </div>
                     <div>
                         <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Status</label>
                         <select id="status" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
@@ -297,10 +308,10 @@
                             <option value="Undocked">Undocked</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Remarks</label>
-                        <input type="text" id="remarks" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
-                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Remarks</label>
+                    <input type="text" id="remarks" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
                 </div>
                 <div class="flex justify-end gap-3 pt-3 border-t border-slate-200">
                     <button type="button" onclick="closeModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-medium transition border border-slate-200">Cancel</button>
@@ -310,10 +321,11 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs & Application Script (Realtime Database) -->
+    <!-- Firebase SDKs & Application Script (Realtime Database & Auth) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA5Cx_G4yo4b8ubvEbqGF2X4371dK7U-mE",
@@ -328,6 +340,7 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
+        const auth = getAuth(app);
 
         let bookings = [];
         let currentYear = 2026;
@@ -335,32 +348,54 @@
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const todayStr = "2026-07-30";
 
-        window.handleLogin = function(e) {
-            e.preventDefault();
-            const email = document.getElementById("loginEmail").value;
-            const pass = document.getElementById("loginPassword").value;
-            if (email && pass) {
-                localStorage.setItem("dockyard_logged", "true");
-                document.getElementById("loginScreen").classList.add("hidden");
+        // Listen to Firebase Authentication state changes
+        onAuthStateChanged(auth, (user) => {
+            const loginScreen = document.getElementById("loginScreen");
+            const userInfoDisplay = document.getElementById("userInfoDisplay");
+            if (user) {
+                loginScreen.classList.add("hidden");
+                userInfoDisplay.innerText = user.email;
+                userInfoDisplay.classList.remove("hidden");
                 initApp();
             } else {
-                document.getElementById("loginError").innerText = "Please enter valid login credentials.";
-                document.getElementById("loginError").classList.remove("hidden");
+                loginScreen.classList.remove("hidden");
+                userInfoDisplay.classList.add("hidden");
+            }
+        });
+
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            const email = document.getElementById("loginEmail").value.trim();
+            const pass = document.getElementById("loginPassword").value;
+            const errorDiv = document.getElementById("loginError");
+            const btnText = document.getElementById("loginBtnText");
+            const spinner = document.getElementById("loginSpinner");
+
+            errorDiv.classList.add("hidden");
+            btnText.innerText = "Authenticating...";
+            spinner.classList.remove("hidden");
+
+            try {
+                await signInWithEmailAndPassword(auth, email, pass);
+            } catch (err) {
+                console.error("Login failed:", err);
+                errorDiv.innerText = err.message.replace("Firebase: ", "");
+                errorDiv.classList.remove("hidden");
+            } finally {
+                btnText.innerText = "Sign In to Dashboard";
+                spinner.classList.add("hidden");
             }
         }
 
-        window.handleLogout = function() {
-            localStorage.removeItem("dockyard_logged");
-            document.getElementById("loginScreen").classList.remove("hidden");
+        window.handleLogout = async function() {
+            try {
+                await signOut(auth);
+            } catch (err) {
+                console.error("Logout error:", err);
+            }
         }
 
         async function initApp() {
-            if (localStorage.getItem("dockyard_logged") === "true") {
-                document.getElementById("loginScreen").classList.add("hidden");
-            } else {
-                document.getElementById("loginScreen").classList.remove("hidden");
-                return;
-            }
             await fetchBookings();
         }
 
@@ -376,19 +411,8 @@
                     });
                 }
                 
-                // Fallback default sample data if Realtime Database is empty
-                if (bookings.length === 0) {
-                    const defaultData = [
-                        { id: 1, quoteNo: "EST/2026/DOCKING/130", vessel: "SAPPHIRE BLACK", customer: "MOHAMED SHAHEED", vesselType: "WOOD", dockingDate: "2026-07-25", quotedDays: 3, estEndDate: "2026-07-28", status: "On-Dock", remarks: "Example vessel: quoted for 25th July 2026." },
-                        { id: 2, quoteNo: "EST/2026/DOCKING/150", vessel: "HURRCANE", customer: "Not Specified", vesselType: "STEEL", dockingDate: "2026-07-13", quotedDays: 5, estEndDate: "2026-07-18", status: "On-Dock", remarks: "" }
-                    ];
-                    for (let item of defaultData) {
-                        const newRef = push(ref(db, "bookings"));
-                        await set(newRef, item);
-                        item.firebaseKey = newRef.key;
-                        bookings.push(item);
-                    }
-                }
+                // Do NOT insert hardcoded default demo data automatically if the database is clean,
+                // or ensure default seed items have unique keys so they can be deleted permanently.
             } catch (err) {
                 console.error("Error fetching from Firebase RTDB:", err);
             }
@@ -451,7 +475,7 @@
         }
 
         function calculateEndDate(startDateStr, quotedDays) {
-            if (!startDateStr) return 'TBD';
+            if (!startDateStr) return '';
             const startDate = new Date(startDateStr);
             startDate.setDate(startDate.getDate() + quotedDays);
             return startDate.toISOString().split('T')[0];
@@ -463,21 +487,8 @@
             if (startStr && days > 0) {
                 const d = new Date(startStr);
                 d.setDate(d.getDate() + days);
-                document.getElementById("estEndDateInput").value = d.toISOString().split('T')[0];
-            }
-        }
-
-        window.calculateFormDaysFromEnd = function() {
-            const startStr = document.getElementById("dockingDate").value;
-            const endStr = document.getElementById("estEndDateInput").value;
-            if (startStr && endStr) {
-                const sDate = new Date(startStr);
-                const eDate = new Date(endStr);
-                const diffTime = eDate - sDate;
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-                if (diffDays > 0) {
-                    document.getElementById("quotedDays").value = diffDays;
-                }
+                const calculatedStr = d.toISOString().split('T')[0];
+                document.getElementById("quotedEndDateInput").value = calculatedStr;
             }
         }
 
@@ -486,11 +497,14 @@
             tbody.innerHTML = "";
             const activeList = data.filter(item => item.status !== "Undocked");
             if (activeList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400">No active booking records found matching your filters.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-400">No active booking records found matching your filters.</td></tr>`;
                 return;
             }
             activeList.forEach((item) => {
-                const estEnd = item.estEndDate || calculateEndDate(item.dockingDate, item.quotedDays);
+                const quotedEnd = item.quotedEndDate || calculateEndDate(item.dockingDate, item.quotedDays);
+                const estEnd = item.estEndDate;
+                const hasDelay = estEnd && estEnd !== quotedEnd;
+
                 const row = document.createElement("tr");
                 row.className = "hover:bg-slate-50 transition border-b border-slate-100 cursor-pointer";
                 row.title = "Double-click to edit booking";
@@ -502,11 +516,14 @@
                     <td class="p-3 text-slate-600">${item.customer}</td>
                     <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] border border-slate-200">${item.vesselType}</span></td>
                     <td class="p-3 text-slate-600 font-mono text-xs">${item.dockingDate || 'TBD'}</td>
-                    <td class="p-3 text-blue-600 font-mono text-xs font-semibold">${estEnd}</td>
+                    <td class="p-3 text-emerald-700 font-mono text-xs font-semibold">${quotedEnd}</td>
+                    <td class="p-3 font-mono text-xs font-semibold ${hasDelay ? 'text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded border border-blue-200' : 'text-slate-400'}">
+                        ${estEnd ? estEnd + ' <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 ml-1" title="Delayed past quoted date"></i>' : '<span class="text-slate-400 italic">On time</span>'}
+                    </td>
                     <td class="p-3 text-slate-600 font-mono text-center">${item.quotedDays}d</td>
                     <td class="p-3">${getStatusBadge(item.status)}</td>
                     <td class="p-3 text-slate-500 text-xs truncate max-w-xs" title="${item.remarks}">${item.remarks || '-'}</td>
-                    <td class="p-3 text-right space-x-2">
+                    <td class="p-3 text-right space-x-2" onclick="event.stopPropagation()">
                         <button onclick="editBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-blue-600 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button onclick="deleteBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-rose-600 transition" title="Delete"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -520,11 +537,14 @@
             tbody.innerHTML = "";
             const completedList = bookings.filter(item => item.status === "Undocked");
             if (completedList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-8 text-slate-400">No completed/undocked vessels in archive.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-400">No completed/undocked vessels in archive.</td></tr>`;
                 return;
             }
             completedList.forEach((item) => {
-                const estEnd = item.estEndDate || calculateEndDate(item.dockingDate, item.quotedDays);
+                const quotedEnd = item.quotedEndDate || calculateEndDate(item.dockingDate, item.quotedDays);
+                const estEnd = item.estEndDate;
+                const hasDelay = estEnd && estEnd !== quotedEnd;
+
                 const row = document.createElement("tr");
                 row.className = "hover:bg-slate-50 transition border-b border-slate-100 cursor-pointer";
                 row.title = "Double-click to edit booking";
@@ -536,11 +556,14 @@
                     <td class="p-3 text-slate-600">${item.customer}</td>
                     <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] border border-slate-200">${item.vesselType}</span></td>
                     <td class="p-3 text-slate-600 font-mono text-xs">${item.dockingDate || 'TBD'}</td>
-                    <td class="p-3 text-blue-600 font-mono text-xs font-semibold">${estEnd}</td>
+                    <td class="p-3 text-emerald-700 font-mono text-xs font-semibold">${quotedEnd}</td>
+                    <td class="p-3 font-mono text-xs font-semibold ${hasDelay ? 'text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded border border-blue-200' : 'text-slate-400'}">
+                        ${estEnd ? estEnd + ' <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 ml-1" title="Delayed past quoted date"></i>' : '<span class="text-slate-400 italic">On time</span>'}
+                    </td>
                     <td class="p-3 text-slate-600 font-mono text-center">${item.quotedDays}d</td>
                     <td class="p-3">${getStatusBadge(item.status)}</td>
                     <td class="p-3 text-slate-500 text-xs truncate max-w-xs" title="${item.remarks}">${item.remarks || '-'}</td>
-                    <td class="p-3 text-right space-x-2">
+                    <td class="p-3 text-right space-x-2" onclick="event.stopPropagation()">
                         <button onclick="editBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-blue-600 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                         <button onclick="deleteBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-rose-600 transition" title="Delete"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -589,8 +612,8 @@
                 quotedEnd.setDate(startDate.getDate() + item.quotedDays);
                 const quotedEndStr = quotedEnd.toISOString().split('T')[0];
 
-                const estEndStr = item.estEndDate || quotedEndStr;
-                const estEndDate = new Date(estEndStr);
+                const estEndStr = item.estEndDate || '';
+                const estEndDate = estEndStr ? new Date(estEndStr) : null;
 
                 let rowHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] border-b border-slate-200 hover:bg-slate-100/60 transition items-center text-xs cursor-pointer" ondblclick="editBooking('${item.firebaseKey}')" title="Double-click to edit booking">`;
                 
@@ -601,7 +624,7 @@
                     </div>
                     <div class="text-[10px] text-slate-500 flex items-center justify-between mt-0.5">
                         <span><i class="fa-solid fa-play text-[9px] text-emerald-600 mr-1"></i>${item.dockingDate}</span>
-                        <span class="text-blue-600 font-semibold" title="Est End Date">Est: ${estEndStr}</span>
+                        <span class="${estEndDate ? 'text-blue-600 font-semibold' : 'text-slate-400'}">Est: ${estEndStr || quotedEndStr}</span>
                     </div>
                 </div>`;
 
@@ -613,28 +636,31 @@
                     const isToday = cellDateStr === todayStr;
 
                     const isQuotedPhase = curr >= startDate && curr < quotedEnd;
-                    const isEstDayMarker = cellDateStr === estEndStr;
+                    const isEstDayMarker = estEndDate && cellDateStr === estEndStr;
                     
-                    let isOverstayPhase = false;
-                    if (item.status !== "Undocked") {
-                        const targetLimitDate = estEndDate > quotedEnd ? estEndDate : quotedEnd;
-                        if (curr >= targetLimitDate && curr <= todayDateObj) {
-                            isOverstayPhase = true;
+                    let isDelayPhase = false;
+                    if (estEndDate && estEndDate > quotedEnd) {
+                        if (curr >= quotedEnd && curr <= estEndDate) {
+                            isDelayPhase = true;
+                        }
+                    } else if (!estEndDate && item.status !== "Undocked") {
+                        if (curr >= quotedEnd && curr <= todayDateObj) {
+                            isDelayPhase = true;
                         }
                     }
 
                     let cellBgClass = isToday ? 'bg-blue-50 border-l border-r border-blue-300' : '';
                     let indicatorHtml = '';
 
-                    if (isOverstayPhase) {
+                    if (isDelayPhase) {
                         cellBgClass = 'bg-orange-100 border-l border-r border-orange-300';
-                        indicatorHtml = `<div class="absolute inset-y-1 left-0 right-0 bg-orange-500 rounded-sm opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-sm" title="Overstay / Not Undocked as of today">⚠️</div>`;
+                        indicatorHtml = `<div class="absolute inset-y-1 left-0 right-0 bg-orange-500 rounded-sm opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-sm" title="Delay / Extended Duration">⚠️</div>`;
                     } else if (isEstDayMarker) {
                         cellBgClass = 'bg-indigo-100 border-l border-r border-indigo-300';
-                        indicatorHtml = `<div class="absolute inset-y-1 left-0 right-0 bg-indigo-600 rounded-sm opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-sm" title="Estimated End Date: ${estEndStr}">EST</div>`;
+                        indicatorHtml = `<div class="absolute inset-y-1 left-0 right-0 bg-indigo-600 rounded-sm opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-sm" title="Estimated Completion Date: ${estEndStr}">EST</div>`;
                     } else if (isQuotedPhase) {
                         cellBgClass = 'bg-emerald-50';
-                        indicatorHtml = `<div class="absolute inset-y-2 left-0 right-0 bg-emerald-500 rounded-sm opacity-90 z-10 shadow-sm" title="Quoted Duration"></div>`;
+                        indicatorHtml = `<div class="absolute inset-y-2 left-0 right-0 bg-emerald-500 rounded-sm opacity-90 z-10 shadow-sm" title="Quoted Span"></div>`;
                     }
 
                     rowHtml += `<div class="h-14 border-r border-slate-200 relative flex items-center ${cellBgClass}">${indicatorHtml}</div>`;
@@ -678,6 +704,7 @@
                 document.getElementById("firebaseKey").value = "";
                 document.getElementById("bookingIdNum").value = "";
                 document.getElementById("quotedDays").value = 5;
+                document.getElementById("estEndDateInput").value = "";
             }
         }
 
@@ -691,7 +718,8 @@
             const existingIdNum = document.getElementById("bookingIdNum").value;
             const dockingDateVal = document.getElementById("dockingDate").value;
             const quotedDaysVal = parseInt(document.getElementById("quotedDays").value) || 1;
-            const estEndVal = document.getElementById("estEndDateInput").value || calculateEndDate(dockingDateVal, quotedDaysVal);
+            const quotedEndCalc = calculateEndDate(dockingDateVal, quotedDaysVal);
+            const estEndVal = document.getElementById("estEndDateInput").value || "";
 
             const newObj = {
                 id: existingIdNum ? parseInt(existingIdNum) : (bookings.length ? Math.max(...bookings.map(b => b.id || 0)) + 1 : 1),
@@ -701,6 +729,7 @@
                 vesselType: document.getElementById("vesselType").value,
                 dockingDate: dockingDateVal,
                 quotedDays: quotedDaysVal,
+                quotedEndDate: quotedEndCalc,
                 estEndDate: estEndVal,
                 status: document.getElementById("status").value,
                 remarks: document.getElementById("remarks").value
@@ -733,7 +762,11 @@
             document.getElementById("vesselType").value = item.vesselType;
             document.getElementById("dockingDate").value = item.dockingDate;
             document.getElementById("quotedDays").value = item.quotedDays;
-            document.getElementById("estEndDateInput").value = item.estEndDate || calculateEndDate(item.dockingDate, item.quotedDays);
+            
+            const quotedEndCalc = item.quotedEndDate || calculateEndDate(item.dockingDate, item.quotedDays);
+            document.getElementById("quotedEndDateInput").value = quotedEndCalc;
+            document.getElementById("estEndDateInput").value = item.estEndDate || "";
+
             document.getElementById("status").value = item.status;
             document.getElementById("remarks").value = item.remarks;
             openModal(true);
@@ -749,8 +782,6 @@
                 }
             }
         }
-
-        initApp();
     </script>
 </body>
 </html>
