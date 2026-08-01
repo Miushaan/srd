@@ -1,145 +1,184 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dockyard Slot Bookings - Timeline Schedule</title>
+    <title>Dockyard Management System — Pro Schedule & Timeline</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- FontAwesome Pro/Free Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        body { font-family: 'Inter', sans-serif; }
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+    </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen font-sans flex flex-col">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 h-full flex flex-col antialiased selection:bg-blue-600 selection:text-white transition-colors duration-200">
 
     <!-- LOGIN SCREEN OVERLAY -->
-    <div id="loginScreen" class="fixed inset-0 bg-slate-900 z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-8 space-y-6">
+    <div id="loginScreen" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl p-8 space-y-6">
             <div class="text-center space-y-2">
-                <div class="bg-blue-600 w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-white shadow-lg">
-                    <i class="fa-solid fa-ship text-2xl"></i>
+                <div class="bg-blue-600 w-12 h-12 mx-auto rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+                    <i class="fa-solid fa-ship text-xl"></i>
                 </div>
-                <h2 class="text-xl font-bold tracking-tight text-slate-900">Dockyard Management System</h2>
-                <p class="text-xs text-slate-500">Sign in with your authorized credentials to access live schedule</p>
+                <h2 class="text-lg font-bold tracking-tight text-slate-900 dark:text-white">Dockyard Management System</h2>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Sign in with your authorized credentials to access live schedule</p>
             </div>
             <form onsubmit="handleLogin(event)" class="space-y-4 text-xs">
                 <div>
-                    <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Email Address</label>
-                    <input type="email" id="loginEmail" required placeholder="Enter authorized email" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                    <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Email Address</label>
+                    <input type="email" id="loginEmail" required placeholder="Enter authorized email" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Password</label>
-                    <input type="password" id="loginPassword" required placeholder="Enter password" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                    <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Password</label>
+                    <input type="password" id="loginPassword" required placeholder="Enter password" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition">
                 </div>
-                <div id="loginError" class="text-rose-600 text-xs text-center hidden font-medium"></div>
-                <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-2.5 rounded-lg text-xs font-semibold transition shadow-md flex items-center justify-center gap-2">
+                <div id="loginError" class="text-rose-600 dark:text-rose-400 text-xs text-center hidden font-medium bg-rose-50 dark:bg-rose-950/50 p-2 rounded-lg border border-rose-200 dark:border-rose-900"></div>
+                <button type="submit" id="loginBtn" class="w-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white py-2.5 rounded-lg text-xs font-semibold transition shadow-md shadow-blue-600/20 flex items-center justify-center gap-2">
                     <span id="loginBtnText">Sign In to Dashboard</span>
                     <i id="loginSpinner" class="fa-solid fa-circle-notch fa-spin hidden"></i>
                 </button>
             </form>
-            <div class="text-center border-t border-slate-100 pt-4 text-[11px] text-slate-400">
+            <div class="text-center border-t border-slate-100 dark:border-slate-800 pt-4 text-[11px] text-slate-400">
                 Connected securely to Firebase Realtime Database
             </div>
         </div>
     </div>
 
-    <!-- Header (White-Blue Theme) -->
-    <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shrink-0 shadow-sm">
-        <div class="w-full px-6 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center space-x-3">
-                <div class="bg-blue-600 p-2 rounded-lg text-white shadow">
-                    <i class="fa-solid fa-ship text-xl"></i>
+    <!-- Header -->
+    <header class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-40 shrink-0 shadow-xs transition-colors duration-200">
+        <div class="w-full px-4 sm:px-6 lg:px-8 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center space-x-3 w-full md:w-auto justify-between md:justify-start">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-blue-600 p-2.5 rounded-xl text-white shadow-sm shadow-blue-600/30">
+                        <i class="fa-solid fa-ship text-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-sm font-bold tracking-tight text-slate-900 dark:text-white leading-tight">Dockyard Slot Bookings</h1>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400">Professional Slot & Vessel Timeline Manager</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-base font-bold tracking-tight text-slate-900 leading-tight">Dockyard Slot Bookings</h1>
-                    <p class="text-[11px] text-slate-500">Professional Slot & Vessel Timeline Manager</p>
+                <div class="flex items-center gap-1 md:hidden">
+                    <button onclick="toggleDarkMode()" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 text-xs" title="Toggle Theme">
+                        <i id="mobileThemeIcon" class="fa-solid fa-moon text-base"></i>
+                    </button>
+                    <button onclick="handleLogout()" class="text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 text-xs" title="Sign Out">
+                        <i class="fa-solid fa-right-from-bracket text-base"></i>
+                    </button>
                 </div>
             </div>
             
             <!-- Navigation Tabs -->
-            <div class="flex bg-slate-100 p-1 rounded-lg border border-slate-200">
-                <button onclick="switchTab('table')" id="tabTableBtn" class="px-4 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+            <div class="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700/80 w-full md:w-auto justify-center">
+                <button onclick="switchTab('table')" id="tabTableBtn" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">
                     <i class="fa-solid fa-table-list mr-1.5"></i> Table View
                 </button>
-                <button onclick="switchTab('completed')" id="tabCompletedBtn" class="px-4 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition">
+                <button onclick="switchTab('completed')" id="tabCompletedBtn" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition">
                     <i class="fa-solid fa-box-archive mr-1.5"></i> Completed Archive
                 </button>
-                <button onclick="switchTab('gantt')" id="tabGanttBtn" class="px-4 py-1.5 rounded-md text-xs font-semibold bg-blue-600 text-white transition shadow">
-                    <i class="fa-solid fa-chart-gantt mr-1.5"></i> Gantt Timeline Calendar
+                <button onclick="switchTab('gantt')" id="tabGanttBtn" class="flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm">
+                    <i class="fa-solid fa-chart-gantt mr-1.5"></i> Timeline Calendar
                 </button>
             </div>
 
-            <div class="flex items-center gap-3">
-                <div id="userInfoDisplay" class="text-xs font-medium text-slate-600 hidden sm:block"></div>
-                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-1.5 rounded-lg text-xs font-medium transition flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-plus"></i> New Booking
+            <div class="hidden md:flex items-center gap-3">
+                <div id="userInfoDisplay" class="text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 hidden"></div>
+                <button onclick="toggleDarkMode()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 p-2.5 rounded-xl text-xs font-medium transition border border-slate-200 dark:border-slate-700" title="Toggle Theme">
+                    <i id="desktopThemeIcon" class="fa-solid fa-moon text-sm"></i>
                 </button>
-                <button onclick="handleLogout()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-medium transition border border-slate-200" title="Sign Out">
-                    <i class="fa-solid fa-right-from-bracket"></i>
+                <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-medium transition flex items-center gap-2 shadow-sm shadow-blue-600/25">
+                    <i class="fa-solid fa-plus text-[10px]"></i> New Booking
+                </button>
+                <button onclick="handleLogout()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 p-2 rounded-xl text-xs font-medium transition border border-slate-200 dark:border-slate-700" title="Sign Out">
+                    <i class="fa-solid fa-right-from-bracket text-sm"></i>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="w-full px-4 py-4 space-y-4 flex-grow flex flex-col">
+    <!-- Main Container (Full Width Fit) -->
+    <main class="w-full px-4 sm:px-6 lg:px-8 py-5 space-y-5 flex-grow flex flex-col">
 
         <!-- KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 shrink-0">
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl flex items-center justify-between shadow-sm">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 shrink-0">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-3.5 rounded-2xl flex items-center justify-between shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
                 <div>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Active Bookings</p>
-                    <h3 id="stat-total" class="text-xl font-bold text-slate-900 mt-0.5">0</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Active Bookings</p>
+                    <h3 id="stat-total" class="text-xl font-bold text-slate-900 dark:text-white mt-1">0</h3>
                 </div>
-                <div class="bg-blue-50 text-blue-600 p-2.5 rounded-lg"><i class="fa-solid fa-clipboard-list text-lg"></i></div>
+                <div class="bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-clipboard-list text-base"></i></div>
             </div>
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-3.5 rounded-2xl flex items-center justify-between shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
                 <div>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Currently On-Dock</p>
-                    <h3 id="stat-ondock" class="text-xl font-bold text-emerald-600 mt-0.5">0</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Currently On-Dock</p>
+                    <h3 id="stat-ondock" class="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">0</h3>
                 </div>
-                <div class="bg-emerald-50 text-emerald-600 p-2.5 rounded-lg"><i class="fa-solid fa-anchor text-lg"></i></div>
+                <div class="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-anchor text-base"></i></div>
             </div>
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-3.5 rounded-2xl flex items-center justify-between shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
                 <div>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">To Be Docked</p>
-                    <h3 id="stat-tobocked" class="text-xl font-bold text-amber-600 mt-0.5">0</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">To Be Docked</p>
+                    <h3 id="stat-tobocked" class="text-xl font-bold text-amber-600 dark:text-amber-400 mt-1">0</h3>
                 </div>
-                <div class="bg-amber-50 text-amber-600 p-2.5 rounded-lg"><i class="fa-solid fa-clock text-lg"></i></div>
+                <div class="bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-clock text-base"></i></div>
             </div>
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-3.5 rounded-2xl flex items-center justify-between shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition">
                 <div>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Quotes Sent</p>
-                    <h3 id="stat-quotes" class="text-xl font-bold text-indigo-600 mt-0.5">0</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Quotes Sent</p>
+                    <h3 id="stat-quotes" class="text-xl font-bold text-indigo-600 dark:text-indigo-400 mt-1">0</h3>
                 </div>
-                <div class="bg-indigo-50 text-indigo-600 p-2.5 rounded-lg"><i class="fa-solid fa-file-invoice-dollar text-lg"></i></div>
+                <div class="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-file-invoice-dollar text-base"></i></div>
             </div>
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl flex items-center justify-between shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-3.5 rounded-2xl flex items-center justify-between shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition col-span-2 sm:col-span-1">
                 <div>
-                    <p class="text-[10px] font-semibold uppercase tracking-wider text-slate-500">Completed (Undocked)</p>
-                    <h3 id="stat-undocked" class="text-xl font-bold text-slate-600 mt-0.5">0</h3>
+                    <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Completed Archive</p>
+                    <h3 id="stat-undocked" class="text-xl font-bold text-slate-600 dark:text-slate-300 mt-1">0</h3>
                 </div>
-                <div class="bg-slate-100 text-slate-600 p-2.5 rounded-lg"><i class="fa-solid fa-box-archive text-lg"></i></div>
+                <div class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 w-10 h-10 rounded-xl flex items-center justify-center"><i class="fa-solid fa-box-archive text-base"></i></div>
             </div>
         </div>
 
         <!-- TAB 1: TABLE VIEW (ACTIVE BOOKINGS) -->
         <div id="sectionTable" class="space-y-4 hidden flex-grow">
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl flex flex-col md:flex-row gap-4 justify-between items-center shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 rounded-2xl flex flex-col md:flex-row gap-3.5 justify-between items-center shadow-xs">
                 <div class="relative w-full md:w-96">
-                    <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-slate-400">
+                    <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none text-slate-400">
                         <i class="fa-solid fa-search text-xs"></i>
                     </span>
-                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Search vessel, customer, or quote #..." class="w-full bg-slate-50 border border-slate-300 rounded-lg pl-9 pr-4 py-1.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500">
+                    <input type="text" id="searchInput" oninput="filterData()" placeholder="Search vessel, customer, or quote #..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl pl-10 pr-4 py-2 text-xs text-slate-800 dark:text-slate-100 focus:outline-none focus:border-blue-500 transition">
                 </div>
                 <div class="flex flex-wrap items-center gap-3 w-full md:w-auto">
-                    <select id="statusFilter" onchange="filterData()" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500">
+                    <select id="statusFilter" onchange="filterData()" class="flex-1 md:flex-none bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition">
                         <option value="">All Statuses</option>
                         <option value="On-Dock">On-Dock</option>
                         <option value="To be docked">To be docked</option>
                         <option value="Quotation Created">Quotation Created</option>
                         <option value="Quote sent to customer">Quote sent to customer</option>
                     </select>
-                    <select id="typeFilter" onchange="filterData()" class="bg-slate-50 border border-slate-300 rounded-lg px-3 py-1.5 text-xs text-slate-700 focus:outline-none focus:border-blue-500">
+                    <select id="typeFilter" onchange="filterData()" class="flex-1 md:flex-none bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 focus:outline-none focus:border-blue-500 transition">
                         <option value="">All Vessel Types</option>
                         <option value="WOOD">WOOD</option>
                         <option value="STEEL">STEEL</option>
@@ -148,26 +187,26 @@
                 </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 text-[11px] uppercase tracking-wider">
-                                <th class="p-3">#</th>
-                                <th class="p-3">Quote No</th>
-                                <th class="p-3">Vessel / Asset</th>
-                                <th class="p-3">Customer</th>
-                                <th class="p-3">Type</th>
-                                <th class="p-3">Docking Date</th>
-                                <th class="p-3">Quoted End Date</th>
-                                <th class="p-3">Est. End Date (Delay)</th>
-                                <th class="p-3">Quoted Days</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Remarks</th>
-                                <th class="p-3 text-right">Actions</th>
+                            <tr class="bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-bold tracking-wider">
+                                <th class="py-3.5 px-4">#</th>
+                                <th class="py-3.5 px-4">Quote No</th>
+                                <th class="py-3.5 px-4">Vessel / Asset</th>
+                                <th class="py-3.5 px-4">Customer</th>
+                                <th class="py-3.5 px-4">Type</th>
+                                <th class="py-3.5 px-4">Docking Date</th>
+                                <th class="py-3.5 px-4">Quoted End</th>
+                                <th class="py-3.5 px-4">Est. End (Delay)</th>
+                                <th class="py-3.5 px-4 text-center">Days</th>
+                                <th class="py-3.5 px-4">Status</th>
+                                <th class="py-3.5 px-4">Remarks</th>
+                                <th class="py-3.5 px-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="tableBody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="tableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300"></tbody>
                     </table>
                 </div>
             </div>
@@ -175,31 +214,33 @@
 
         <!-- TAB 1.5: COMPLETED ARCHIVE VIEW -->
         <div id="sectionCompleted" class="space-y-4 hidden flex-grow">
-            <div class="bg-white border border-slate-200 p-3.5 rounded-xl shadow-sm">
-                <h3 class="text-sm font-bold text-slate-900"><i class="fa-solid fa-box-archive text-slate-400 mr-2"></i> Completed & Undocked Vessels Archive</h3>
-                <p class="text-[11px] text-slate-500 mt-0.5">Bookings marked with status 'Undocked' are archived here automatically. Double-click any row to edit.</p>
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 rounded-2xl shadow-xs flex justify-between items-center">
+                <div>
+                    <h3 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider"><i class="fa-solid fa-box-archive text-slate-400 mr-2"></i> Completed & Undocked Vessels Archive</h3>
+                    <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Bookings marked with status 'Undocked' are archived here automatically. Double-click any row to edit.</p>
+                </div>
             </div>
 
-            <div class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse text-xs">
                         <thead>
-                            <tr class="bg-slate-100 text-slate-600 border-b border-slate-200 text-[11px] uppercase tracking-wider">
-                                <th class="p-3">#</th>
-                                <th class="p-3">Quote No</th>
-                                <th class="p-3">Vessel / Asset</th>
-                                <th class="p-3">Customer</th>
-                                <th class="p-3">Type</th>
-                                <th class="p-3">Docking Date</th>
-                                <th class="p-3">Quoted End Date</th>
-                                <th class="p-3">Est. End Date (Delay)</th>
-                                <th class="p-3">Quoted Days</th>
-                                <th class="p-3">Status</th>
-                                <th class="p-3">Remarks</th>
-                                <th class="p-3 text-right">Actions</th>
+                            <tr class="bg-slate-50/80 dark:bg-slate-800/80 text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800 text-[10px] uppercase font-bold tracking-wider">
+                                <th class="py-3.5 px-4">#</th>
+                                <th class="py-3.5 px-4">Quote No</th>
+                                <th class="py-3.5 px-4">Vessel / Asset</th>
+                                <th class="py-3.5 px-4">Customer</th>
+                                <th class="py-3.5 px-4">Type</th>
+                                <th class="py-3.5 px-4">Docking Date</th>
+                                <th class="py-3.5 px-4">Quoted End</th>
+                                <th class="py-3.5 px-4">Est. End (Delay)</th>
+                                <th class="py-3.5 px-4 text-center">Days</th>
+                                <th class="py-3.5 px-4">Status</th>
+                                <th class="py-3.5 px-4">Remarks</th>
+                                <th class="py-3.5 px-4 text-right">Actions</th>
                             </tr>
                         </thead>
-                        <tbody id="completedTableBody" class="divide-y divide-slate-100"></tbody>
+                        <tbody id="completedTableBody" class="divide-y divide-slate-100 dark:divide-slate-800 text-slate-700 dark:text-slate-300"></tbody>
                     </table>
                 </div>
             </div>
@@ -207,33 +248,37 @@
 
         <!-- TAB 2: GANTT CALENDAR TIMELINE VIEW -->
         <div id="sectionGantt" class="space-y-4 flex-grow flex flex-col">
-            <div class="bg-white border border-slate-200 p-4 rounded-xl shadow-sm space-y-4 flex-grow flex flex-col">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-4 sm:p-5 rounded-2xl shadow-xs space-y-4 flex-grow flex flex-col">
                 
                 <!-- Gantt Controls Header -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-3 shrink-0">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5 shrink-0">
                     <div>
-                        <h2 class="text-sm font-bold text-slate-900 flex items-center gap-2">
-                            <i class="fa-solid fa-calendar-days text-blue-600"></i> Dockyard Timeline Schedule
+                        <h2 class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-days text-blue-600"></i> Dockyard Timeline Schedule Matrix
                         </h2>
-                        <p class="text-[11px] text-slate-500 mt-0.5">Double-click any vessel row or timeline bar to quickly edit booking details.</p>
+                        <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">Active schedule timeline (Undocked vessels are hidden).</p>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <button onclick="changeMonth(-1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-slate-200">
-                            <i class="fa-solid fa-chevron-left mr-1"></i> Prev Month
-                        </button>
-                        <span id="currentMonthLabel" class="text-xs font-bold text-slate-900 uppercase tracking-wider px-2">July 2026</span>
-                        <button onclick="changeMonth(1)" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1.5 rounded-lg text-xs font-semibold transition border border-slate-200">
-                            Next Month <i class="fa-solid fa-chevron-right ml-1"></i>
-                        </button>
-                        <div class="h-4 w-[1px] bg-slate-200 mx-1"></div>
-                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Quoted Span</span>
-                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Est. Completion</span>
-                        <span class="flex items-center gap-1.5 text-[11px] text-slate-600"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Overstay/Delay</span>
+                    <div class="flex flex-wrap items-center gap-2.5">
+                        <div class="flex items-center bg-slate-100 dark:bg-slate-800 rounded-xl p-1 border border-slate-200 dark:border-slate-700">
+                            <button onclick="changeMonth(-1)" class="bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1 rounded-lg text-xs font-semibold transition shadow-xs">
+                                <i class="fa-solid fa-chevron-left mr-1"></i> Prev
+                            </button>
+                            <span id="currentMonthLabel" class="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider px-3">July 2026</span>
+                            <button onclick="changeMonth(1)" class="bg-white dark:bg-slate-700 hover:bg-slate-50 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1 rounded-lg text-xs font-semibold transition shadow-xs">
+                                Next <i class="fa-solid fa-chevron-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="h-4 w-[1px] bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
+                        <div class="flex items-center gap-3 text-[11px] text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Quoted Span</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-indigo-500 inline-block"></span> Est. Completion</span>
+                            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block"></span> Overstay</span>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Gantt Chart Matrix Container -->
-                <div class="overflow-x-auto border border-slate-200 rounded-xl bg-slate-50 flex-grow">
+                <div class="overflow-x-auto border border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/50 dark:bg-slate-950/50 flex-grow">
                     <div id="ganttChartBody" class="min-w-[1200px]">
                         <!-- Dynamically generated via JS -->
                     </div>
@@ -245,62 +290,64 @@
     </main>
 
     <!-- Modal for Add/Edit Booking -->
-    <div id="bookingModal" class="fixed inset-0 bg-slate-900/55 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white border border-slate-200 rounded-xl w-full max-w-2xl overflow-hidden shadow-xl">
-            <div class="px-6 py-4 bg-slate-100 border-b border-slate-200 flex justify-between items-center">
-                <h3 id="modalTitle" class="font-bold text-sm text-slate-900">New Booking</h3>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700"><i class="fa-solid fa-xmark text-base"></i></button>
+    <div id="bookingModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div class="px-6 py-4 bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h3 id="modalTitle" class="font-bold text-xs uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-ship text-blue-600"></i> New Booking
+                </h3>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-200/60 dark:hover:bg-slate-700"><i class="fa-solid fa-xmark text-sm"></i></button>
             </div>
             <form id="bookingForm" onsubmit="saveBooking(event)" class="p-6 space-y-4 text-xs">
                 <input type="hidden" id="firebaseKey">
                 <input type="hidden" id="bookingIdNum">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quote Number</label>
-                        <input type="text" id="quoteNo" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Quote Number</label>
+                        <input type="text" id="quoteNo" required placeholder="e.g. EST/2026/DOCKING/130" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition font-mono">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Vessel / Asset Name</label>
-                        <input type="text" id="vesselName" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Vessel / Asset Name</label>
+                        <input type="text" id="vesselName" required placeholder="e.g. SAPPHIRE BLACK" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition uppercase font-semibold">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Customer</label>
-                        <input type="text" id="customerName" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none" placeholder="Not Specified">
+                        <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Customer</label>
+                        <input type="text" id="customerName" placeholder="Client Name or Company" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Vessel Type</label>
-                        <select id="vesselType" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Vessel Type</label>
+                        <select id="vesselType" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition">
                             <option value="WOOD">WOOD</option>
                             <option value="STEEL">STEEL</option>
                             <option value="FIBER">FIBER</option>
                         </select>
                     </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-slate-50/70 dark:bg-slate-800/50 p-4 rounded-xl border border-slate-200/60 dark:border-slate-700/60">
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Docking Date (Start)</label>
-                        <input type="date" id="dockingDate" onchange="calculateFormEndDate()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Docking Date (Start)</label>
+                        <input type="date" id="dockingDate" onchange="calculateFormEndDate()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none font-mono">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quoted Days</label>
-                        <input type="number" id="quotedDays" oninput="calculateFormEndDate()" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none" value="5">
+                        <label class="block text-[10px] font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider mb-1">Quoted Days</label>
+                        <input type="number" id="quotedDays" min="1" oninput="calculateFormEndDate()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:outline-none font-mono" value="5">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Quoted End Date (Auto)</label>
-                        <input type="date" id="quotedEndDateInput" readonly class="w-full bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-xs text-emerald-700 font-mono font-semibold focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider mb-1">Quoted End Date</label>
+                        <input type="date" id="quotedEndDateInput" readonly class="w-full bg-emerald-50/60 dark:bg-emerald-950/40 border border-emerald-300 dark:border-emerald-800 rounded-xl px-3 py-2 text-xs text-emerald-800 dark:text-emerald-300 font-mono font-bold focus:outline-none">
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Estimated End Date (If delayed / extended)</label>
-                        <input type="date" id="estEndDateInput" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-blue-600 font-mono font-semibold focus:border-blue-500 focus:outline-none" placeholder="Leave blank if completed on quoted date">
-                        <p class="text-[10px] text-slate-400 mt-0.5">Select only if vessel exceeds quoted duration.</p>
+                        <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Estimated End Date (If delayed / extended)</label>
+                        <input type="date" id="estEndDateInput" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-blue-600 dark:text-blue-400 font-mono font-semibold focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition">
+                        <p class="text-[10px] text-slate-400 mt-1">Select only if vessel exceeds quoted duration.</p>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Status</label>
-                        <select id="status" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                        <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Status</label>
+                        <select id="status" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition font-medium">
                             <option value="On-Dock">On-Dock</option>
                             <option value="To be docked">To be docked</option>
                             <option value="Quotation Created">Quotation Created</option>
@@ -310,18 +357,18 @@
                     </div>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-semibold text-slate-500 uppercase mb-1">Remarks</label>
-                    <input type="text" id="remarks" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-xs text-slate-900 focus:border-blue-500 focus:outline-none">
+                    <label class="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-1">Remarks</label>
+                    <input type="text" id="remarks" placeholder="Optional notes or work descriptions..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-900 dark:text-white focus:border-blue-500 focus:bg-white dark:focus:bg-slate-800 focus:outline-none transition">
                 </div>
-                <div class="flex justify-end gap-3 pt-3 border-t border-slate-200">
-                    <button type="button" onclick="closeModal()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-medium transition border border-slate-200">Cancel</button>
-                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-xs font-medium transition shadow-sm">Save Booking</button>
+                <div class="flex justify-end gap-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <button type="button" onclick="closeModal()" class="bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl text-xs font-semibold transition border border-slate-200 dark:border-slate-700">Cancel</button>
+                    <button type="submit" class="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-5 py-2.5 rounded-xl text-xs font-semibold transition shadow-sm shadow-blue-600/25">Save Booking</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Firebase SDKs & Application Script (Realtime Database & Auth) -->
+    <!-- Firebase SDKs & Application Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getDatabase, ref, get, set, push, remove, update } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
@@ -348,7 +395,36 @@
         const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         const todayStr = "2026-07-30";
 
-        // Listen to Firebase Authentication state changes
+        // Dark Mode Initialization
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        updateThemeIcons();
+
+        window.toggleDarkMode = function() {
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.classList.contains('dark');
+            const iconClass = isDark ? "fa-solid fa-sun text-sm" : "fa-solid fa-moon text-sm";
+            const mobileIconClass = isDark ? "fa-solid fa-sun text-base" : "fa-solid fa-moon text-base";
+            const desktopIcon = document.getElementById("desktopThemeIcon");
+            const mobileIcon = document.getElementById("mobileThemeIcon");
+            if (desktopIcon) desktopIcon.className = iconClass;
+            if (mobileIcon) mobileIcon.className = mobileIconClass;
+        }
+
+        // Listen to Firebase Auth State Changes
         onAuthStateChanged(auth, (user) => {
             const loginScreen = document.getElementById("loginScreen");
             const userInfoDisplay = document.getElementById("userInfoDisplay");
@@ -410,9 +486,6 @@
                         bookings.push({ firebaseKey: key, ...data[key] });
                     });
                 }
-                
-                // Do NOT insert hardcoded default demo data automatically if the database is clean,
-                // or ensure default seed items have unique keys so they can be deleted permanently.
             } catch (err) {
                 console.error("Error fetching from Firebase RTDB:", err);
             }
@@ -430,23 +503,23 @@
             const completedSec = document.getElementById("sectionCompleted");
             const ganttSec = document.getElementById("sectionGantt");
 
-            tableBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
-            completedBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
-            ganttBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold text-slate-600 hover:text-slate-900 transition";
+            tableBtn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition";
+            completedBtn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition";
+            ganttBtn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition";
             tableSec.classList.add("hidden");
             completedSec.classList.add("hidden");
             ganttSec.classList.add("hidden");
 
             if (tab === 'table') {
-                tableBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold bg-blue-600 text-white transition shadow";
+                tableBtn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
                 tableSec.classList.remove("hidden");
                 renderTable(bookings);
             } else if (tab === 'completed') {
-                completedBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold bg-blue-600 text-white transition shadow";
+                completedBtn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
                 completedSec.classList.remove("hidden");
                 renderCompletedTable();
             } else {
-                ganttBtn.className = "px-4 py-1.5 rounded-md text-xs font-semibold bg-blue-600 text-white transition shadow";
+                ganttBtn.className = "flex-1 md:flex-none px-4 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 text-white transition shadow-sm";
                 ganttSec.classList.remove("hidden");
                 renderGanttCalendar();
             }
@@ -465,12 +538,12 @@
         }
 
         function getStatusBadge(status) {
-            let classes = "px-2.5 py-0.5 rounded-full text-[11px] font-semibold inline-block ";
-            if (status === "On-Dock") classes += "bg-emerald-100 text-emerald-700 border border-emerald-200";
-            else if (status === "To be docked") classes += "bg-amber-100 text-amber-700 border border-amber-200";
-            else if (status === "Quotation Created") classes += "bg-blue-100 text-blue-700 border border-blue-200";
-            else if (status === "Undocked") classes += "bg-slate-200 text-slate-700 border border-slate-300";
-            else classes += "bg-indigo-100 text-indigo-700 border border-indigo-200";
+            let classes = "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider inline-flex items-center gap-1.5 ";
+            if (status === "On-Dock") classes += "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400 border border-emerald-200/80 dark:border-emerald-800";
+            else if (status === "To be docked") classes += "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-400 border border-amber-200/80 dark:border-amber-800";
+            else if (status === "Quotation Created") classes += "bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 border border-blue-200/80 dark:border-blue-800";
+            else if (status === "Undocked") classes += "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700";
+            else classes += "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 border border-indigo-200/80 dark:border-indigo-800";
             return `<span class="${classes}">${status}</span>`;
         }
 
@@ -497,7 +570,7 @@
             tbody.innerHTML = "";
             const activeList = data.filter(item => item.status !== "Undocked");
             if (activeList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-400">No active booking records found matching your filters.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-12 text-slate-400 dark:text-slate-500 font-medium">No active booking records found matching your filters.</td></tr>`;
                 return;
             }
             activeList.forEach((item) => {
@@ -506,26 +579,26 @@
                 const hasDelay = estEnd && estEnd !== quotedEnd;
 
                 const row = document.createElement("tr");
-                row.className = "hover:bg-slate-50 transition border-b border-slate-100 cursor-pointer";
+                row.className = "hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 cursor-pointer group";
                 row.title = "Double-click to edit booking";
                 row.ondblclick = () => editBooking(item.firebaseKey);
                 row.innerHTML = `
-                    <td class="p-3 text-slate-500 font-mono text-[11px]">${item.id || '-'}</td>
-                    <td class="p-3 font-medium text-slate-700 text-xs">${item.quoteNo}</td>
-                    <td class="p-3 font-semibold text-slate-900">${item.vessel}</td>
-                    <td class="p-3 text-slate-600">${item.customer}</td>
-                    <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] border border-slate-200">${item.vesselType}</span></td>
-                    <td class="p-3 text-slate-600 font-mono text-xs">${item.dockingDate || 'TBD'}</td>
-                    <td class="p-3 text-emerald-700 font-mono text-xs font-semibold">${quotedEnd}</td>
-                    <td class="p-3 font-mono text-xs font-semibold ${hasDelay ? 'text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded border border-blue-200' : 'text-slate-400'}">
-                        ${estEnd ? estEnd + ' <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 ml-1" title="Delayed past quoted date"></i>' : '<span class="text-slate-400 italic">On time</span>'}
+                    <td class="py-3 px-4 text-slate-400 font-mono text-[11px]">${item.id || '-'}</td>
+                    <td class="py-3 px-4 font-mono font-medium text-slate-800 dark:text-slate-200">${item.quoteNo}</td>
+                    <td class="py-3 px-4 font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">${item.vessel}</td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300">${item.customer || 'Not Specified'}</td>
+                    <td class="py-3 px-4"><span class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-slate-200/80 dark:border-slate-700">${item.vesselType}</span></td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300 font-mono">${item.dockingDate || 'TBD'}</td>
+                    <td class="py-3 px-4 text-emerald-700 dark:text-emerald-400 font-mono font-semibold">${quotedEnd}</td>
+                    <td class="py-3 px-4 font-mono font-semibold ${hasDelay ? 'text-blue-600 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/40 px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-900' : 'text-slate-400'}">
+                        ${estEnd ? estEnd + ' <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 ml-1" title="Delayed past quoted date"></i>' : '<span class="text-slate-400 font-normal italic">On schedule</span>'}
                     </td>
-                    <td class="p-3 text-slate-600 font-mono text-center">${item.quotedDays}d</td>
-                    <td class="p-3">${getStatusBadge(item.status)}</td>
-                    <td class="p-3 text-slate-500 text-xs truncate max-w-xs" title="${item.remarks}">${item.remarks || '-'}</td>
-                    <td class="p-3 text-right space-x-2" onclick="event.stopPropagation()">
-                        <button onclick="editBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-blue-600 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-rose-600 transition" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300 font-mono text-center font-medium">${item.quotedDays}d</td>
+                    <td class="py-3 px-4">${getStatusBadge(item.status)}</td>
+                    <td class="py-3 px-4 text-slate-500 dark:text-slate-400 truncate max-w-xs" title="${item.remarks}">${item.remarks || '-'}</td>
+                    <td class="py-3 px-4 text-right space-x-1.5" onclick="event.stopPropagation()">
+                        <button onclick="editBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-slate-800 transition" title="Delete"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -537,7 +610,7 @@
             tbody.innerHTML = "";
             const completedList = bookings.filter(item => item.status === "Undocked");
             if (completedList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-8 text-slate-400">No completed/undocked vessels in archive.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="12" class="text-center py-12 text-slate-400 dark:text-slate-500 font-medium">No completed/undocked vessels in archive.</td></tr>`;
                 return;
             }
             completedList.forEach((item) => {
@@ -546,26 +619,26 @@
                 const hasDelay = estEnd && estEnd !== quotedEnd;
 
                 const row = document.createElement("tr");
-                row.className = "hover:bg-slate-50 transition border-b border-slate-100 cursor-pointer";
+                row.className = "hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition border-b border-slate-100 dark:border-slate-800 cursor-pointer group";
                 row.title = "Double-click to edit booking";
                 row.ondblclick = () => editBooking(item.firebaseKey);
                 row.innerHTML = `
-                    <td class="p-3 text-slate-500 font-mono text-[11px]">${item.id || '-'}</td>
-                    <td class="p-3 font-medium text-slate-700 text-xs">${item.quoteNo}</td>
-                    <td class="p-3 font-semibold text-slate-900">${item.vessel}</td>
-                    <td class="p-3 text-slate-600">${item.customer}</td>
-                    <td class="p-3"><span class="bg-slate-100 text-slate-700 px-2 py-0.5 rounded text-[10px] border border-slate-200">${item.vesselType}</span></td>
-                    <td class="p-3 text-slate-600 font-mono text-xs">${item.dockingDate || 'TBD'}</td>
-                    <td class="p-3 text-emerald-700 font-mono text-xs font-semibold">${quotedEnd}</td>
-                    <td class="p-3 font-mono text-xs font-semibold ${hasDelay ? 'text-blue-600 bg-blue-50/50 px-1.5 py-0.5 rounded border border-blue-200' : 'text-slate-400'}">
-                        ${estEnd ? estEnd + ' <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 ml-1" title="Delayed past quoted date"></i>' : '<span class="text-slate-400 italic">On time</span>'}
+                    <td class="py-3 px-4 text-slate-400 font-mono text-[11px]">${item.id || '-'}</td>
+                    <td class="py-3 px-4 font-mono font-medium text-slate-800 dark:text-slate-200">${item.quoteNo}</td>
+                    <td class="py-3 px-4 font-bold text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">${item.vessel}</td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300">${item.customer || 'Not Specified'}</td>
+                    <td class="py-3 px-4"><span class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 px-2.5 py-1 rounded-lg text-[10px] font-bold border border-slate-200/80 dark:border-slate-700">${item.vesselType}</span></td>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300 font-mono">${item.dockingDate || 'TBD'}</td>
+                    <td class="py-3 px-4 text-emerald-700 dark:text-emerald-400 font-mono font-semibold">${quotedEnd}</td>
+                    <td class="py-3 px-4 font-mono font-semibold ${hasDelay ? 'text-blue-600 dark:text-blue-400 bg-blue-50/60 dark:bg-blue-950/40 px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-900' : 'text-slate-400'}">
+                        ${estEnd ? estEnd + ' <i class="fa-solid fa-triangle-exclamation text-[10px] text-amber-500 ml-1" title="Delayed past quoted date"></i>' : '<span class="text-slate-400 font-normal italic">On schedule</span>'}
                     </td>
-                    <td class="p-3 text-slate-600 font-mono text-center">${item.quotedDays}d</td>
-                    <td class="p-3">${getStatusBadge(item.status)}</td>
-                    <td class="p-3 text-slate-500 text-xs truncate max-w-xs" title="${item.remarks}">${item.remarks || '-'}</td>
-                    <td class="p-3 text-right space-x-2" onclick="event.stopPropagation()">
-                        <button onclick="editBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-blue-600 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                        <button onclick="deleteBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-rose-600 transition" title="Delete"><i class="fa-solid fa-trash"></i></button>
+                    <td class="py-3 px-4 text-slate-600 dark:text-slate-300 font-mono text-center font-medium">${item.quotedDays}d</td>
+                    <td class="py-3 px-4">${getStatusBadge(item.status)}</td>
+                    <td class="py-3 px-4 text-slate-500 dark:text-slate-400 truncate max-w-xs" title="${item.remarks}">${item.remarks || '-'}</td>
+                    <td class="py-3 px-4 text-right space-x-1.5" onclick="event.stopPropagation()">
+                        <button onclick="editBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 p-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-slate-800 transition" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button onclick="deleteBooking('${item.firebaseKey}')" class="text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-rose-50 dark:hover:bg-slate-800 transition" title="Delete"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -579,30 +652,31 @@
 
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
 
-            let headerTopHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] bg-white border-b border-slate-200 text-xs font-semibold text-slate-600 sticky top-0 z-20">`;
-            headerTopHtml += `<div class="p-3 border-r border-slate-200 bg-white sticky left-0 z-30 flex items-center justify-between"><span>Vessel & Timeline Summary</span></div>`;
-            headerTopHtml += `<div class="col-span-${daysInMonth} text-center py-2 border-r border-slate-200 bg-slate-100 font-bold text-blue-600 uppercase tracking-wider">${monthNames[currentMonth]} ${currentYear}</div>`;
+            let headerTopHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 text-xs font-semibold text-slate-600 dark:text-slate-300 sticky top-0 z-20 shadow-xs">`;
+            headerTopHtml += `<div class="p-3 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky left-0 z-30 font-bold text-slate-700 dark:text-slate-200">Vessel & Timeline Summary</div>`;
+            headerTopHtml += `<div class="col-span-${daysInMonth} text-center py-2.5 border-r border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800 font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider">${monthNames[currentMonth]} ${currentYear}</div>`;
             headerTopHtml += `</div>`;
 
-            let headerDaysHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] bg-slate-50 border-b border-slate-200 text-[11px] font-semibold text-slate-600 sticky top-[33px] z-20">`;
-            headerDaysHtml += `<div class="p-2 border-r border-slate-200 bg-slate-50 sticky left-0 z-30">Day of Month</div>`;
+            let headerDaysHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] bg-slate-50/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 text-[11px] font-semibold text-slate-600 dark:text-slate-400 sticky top-[37px] z-20 backdrop-blur-xs">`;
+            headerDaysHtml += `<div class="p-2.5 border-r border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 sticky left-0 z-30 font-bold text-slate-500 dark:text-slate-400 uppercase text-[10px]">Day of Month</div>`;
             
             let tempDateCheck = new Date(currentYear, currentMonth, 1);
 
             for (let i = 0; i < daysInMonth; i++) {
                 const cStr = tempDateCheck.toISOString().split('T')[0];
                 const isToday = cStr === todayStr;
-                headerDaysHtml += `<div class="p-1.5 text-center border-r border-slate-200 ${isToday ? 'bg-blue-100 text-blue-700 font-bold' : ''}">${tempDateCheck.getDate()}</div>`;
+                headerDaysHtml += `<div class="p-1.5 text-center border-r border-slate-200 dark:border-slate-800 font-mono ${isToday ? 'bg-blue-600 text-white font-bold rounded-md shadow-xs' : ''}">${tempDateCheck.getDate()}</div>`;
                 tempDateCheck.setDate(tempDateCheck.getDate() + 1);
             }
             headerDaysHtml += `</div>`;
 
             container.innerHTML = headerTopHtml + headerDaysHtml;
 
-            const scheduled = bookings.filter(b => b.dockingDate);
+            // Exclude 'Undocked' status from the timeline calendar view
+            const scheduled = bookings.filter(b => b.dockingDate && b.status !== "Undocked");
 
             if (scheduled.length === 0) {
-                container.innerHTML += `<div class="p-8 text-center text-slate-400">No vessels scheduled with docking dates.</div>`;
+                container.innerHTML += `<div class="p-12 text-center text-slate-400 dark:text-slate-500 font-medium">No active scheduled vessels found for this view.</div>`;
                 return;
             }
 
@@ -615,16 +689,15 @@
                 const estEndStr = item.estEndDate || '';
                 const estEndDate = estEndStr ? new Date(estEndStr) : null;
 
-                let rowHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] border-b border-slate-200 hover:bg-slate-100/60 transition items-center text-xs cursor-pointer" ondblclick="editBooking('${item.firebaseKey}')" title="Double-click to edit booking">`;
+                let rowHtml = `<div class="grid grid-cols-[280px_repeat(${daysInMonth},minmax(34px,1fr))] border-b border-slate-200 dark:border-slate-800 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 transition items-center text-xs cursor-pointer group" ondblclick="editBooking('${item.firebaseKey}')" title="Double-click to edit booking">`;
                 
-                rowHtml += `<div class="p-3 border-r border-slate-200 bg-white sticky left-0 z-10">
-                    <div class="font-bold text-slate-900 truncate flex items-center justify-between">
-                        <span>${item.vessel}</span>
-                        ${item.status === 'Undocked' ? '<span class="text-[9px] bg-slate-200 text-slate-700 px-1.5 rounded">Undocked</span>' : ''}
+                rowHtml += `<div class="p-3 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 sticky left-0 z-10 group-hover:bg-slate-50 dark:group-hover:bg-slate-800/80 transition">
+                    <div class="font-bold text-slate-900 dark:text-white truncate flex items-center justify-between">
+                        <span class="group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">${item.vessel}</span>
                     </div>
-                    <div class="text-[10px] text-slate-500 flex items-center justify-between mt-0.5">
-                        <span><i class="fa-solid fa-play text-[9px] text-emerald-600 mr-1"></i>${item.dockingDate}</span>
-                        <span class="${estEndDate ? 'text-blue-600 font-semibold' : 'text-slate-400'}">Est: ${estEndStr || quotedEndStr}</span>
+                    <div class="text-[10px] text-slate-500 dark:text-slate-400 flex items-center justify-between mt-1 font-mono">
+                        <span><i class="fa-solid fa-play text-[8px] text-emerald-600 mr-1"></i>${item.dockingDate}</span>
+                        <span class="${estEndDate ? 'text-blue-600 dark:text-blue-400 font-bold' : 'text-slate-400'}">Est: ${estEndStr || quotedEndStr}</span>
                     </div>
                 </div>`;
 
@@ -643,27 +716,27 @@
                         if (curr >= quotedEnd && curr <= estEndDate) {
                             isDelayPhase = true;
                         }
-                    } else if (!estEndDate && item.status !== "Undocked") {
+                    } else if (!estEndDate) {
                         if (curr >= quotedEnd && curr <= todayDateObj) {
                             isDelayPhase = true;
                         }
                     }
 
-                    let cellBgClass = isToday ? 'bg-blue-50 border-l border-r border-blue-300' : '';
+                    let cellBgClass = isToday ? 'bg-blue-50/80 dark:bg-blue-950/40 border-l border-r border-blue-200 dark:border-blue-900' : '';
                     let indicatorHtml = '';
 
                     if (isDelayPhase) {
-                        cellBgClass = 'bg-orange-100 border-l border-r border-orange-300';
-                        indicatorHtml = `<div class="absolute inset-y-1 left-0 right-0 bg-orange-500 rounded-sm opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-sm" title="Delay / Extended Duration">⚠️</div>`;
+                        cellBgClass = 'bg-orange-50/80 dark:bg-orange-950/40 border-l border-r border-orange-200 dark:border-orange-900';
+                        indicatorHtml = `<div class="absolute inset-y-1.5 left-0 right-0 bg-orange-500 rounded-md opacity-90 z-10 flex items-center justify-center text-[10px] font-bold text-white shadow-xs" title="Delay / Extended Duration">⚠️</div>`;
                     } else if (isEstDayMarker) {
-                        cellBgClass = 'bg-indigo-100 border-l border-r border-indigo-300';
-                        indicatorHtml = `<div class="absolute inset-y-1 left-0 right-0 bg-indigo-600 rounded-sm opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-sm" title="Estimated Completion Date: ${estEndStr}">EST</div>`;
+                        cellBgClass = 'bg-indigo-50/80 dark:bg-indigo-950/40 border-l border-r border-indigo-200 dark:border-indigo-900';
+                        indicatorHtml = `<div class="absolute inset-y-1.5 left-0 right-0 bg-indigo-600 rounded-md opacity-90 z-10 flex items-center justify-center text-[9px] font-bold text-white shadow-xs" title="Estimated Completion Date: ${estEndStr}">EST</div>`;
                     } else if (isQuotedPhase) {
-                        cellBgClass = 'bg-emerald-50';
-                        indicatorHtml = `<div class="absolute inset-y-2 left-0 right-0 bg-emerald-500 rounded-sm opacity-90 z-10 shadow-sm" title="Quoted Span"></div>`;
+                        cellBgClass = 'bg-emerald-50/40 dark:bg-emerald-950/30';
+                        indicatorHtml = `<div class="absolute inset-y-2.5 left-0 right-0 bg-emerald-500 rounded-md opacity-90 z-10 shadow-xs" title="Quoted Span"></div>`;
                     }
 
-                    rowHtml += `<div class="h-14 border-r border-slate-200 relative flex items-center ${cellBgClass}">${indicatorHtml}</div>`;
+                    rowHtml += `<div class="h-14 border-r border-slate-200/80 dark:border-slate-800/80 relative flex items-center ${cellBgClass}">${indicatorHtml}</div>`;
 
                     curr.setDate(curr.getDate() + 1);
                 }
@@ -688,7 +761,7 @@
             const typeVal = document.getElementById("typeFilter").value;
 
             const filtered = bookings.filter(item => {
-                const matchQuery = item.vessel.toLowerCase().includes(query) || item.customer.toLowerCase().includes(query) || item.quoteNo.toLowerCase().includes(query);
+                const matchQuery = item.vessel.toLowerCase().includes(query) || (item.customer && item.customer.toLowerCase().includes(query)) || item.quoteNo.toLowerCase().includes(query);
                 const matchStatus = statusVal === "" || item.status === statusVal;
                 const matchType = typeVal === "" || item.vesselType === typeVal;
                 return matchQuery && matchStatus && matchType;
@@ -699,7 +772,7 @@
         window.openModal = function(isEdit = false) {
             document.getElementById("bookingModal").classList.remove("hidden");
             if (!isEdit) {
-                document.getElementById("modalTitle").innerText = "New Booking";
+                document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-ship text-blue-600"></i> New Booking`;
                 document.getElementById("bookingForm").reset();
                 document.getElementById("firebaseKey").value = "";
                 document.getElementById("bookingIdNum").value = "";
@@ -753,7 +826,7 @@
         window.editBooking = function(firebaseKey) {
             const item = bookings.find(b => b.firebaseKey === firebaseKey);
             if (!item) return;
-            document.getElementById("modalTitle").innerText = "Edit Booking #" + (item.id || '');
+            document.getElementById("modalTitle").innerHTML = `<i class="fa-solid fa-pen-to-square text-blue-600"></i> Edit Booking #${item.id || ''}`;
             document.getElementById("firebaseKey").value = item.firebaseKey;
             document.getElementById("bookingIdNum").value = item.id || '';
             document.getElementById("quoteNo").value = item.quoteNo;
@@ -768,7 +841,7 @@
             document.getElementById("estEndDateInput").value = item.estEndDate || "";
 
             document.getElementById("status").value = item.status;
-            document.getElementById("remarks").value = item.remarks;
+            document.getElementById("remarks").value = item.remarks || "";
             openModal(true);
         }
 
